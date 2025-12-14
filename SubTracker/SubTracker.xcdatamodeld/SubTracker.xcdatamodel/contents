@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE model SYSTEM "x-coredata://www.apple.com/coredata/NSManagedObjectModel.dtd">
+<model name="SubTracker" userDefinedModelVersionIdentifier="" type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="21754" systemVersion="21F79" minimumToolsVersion="Automatic" sourceLanguage="Swift" usedWithSwiftData="NO" iOSVersion="Automatic" macOSVersion="Automatic" watchOSVersion="Automatic" tvOSVersion="Automatic" visibleEntities="SubscriptionEntity">
+    <entity name="SubscriptionEntity" representedClassName="SubscriptionEntity" syncable="YES" codeGenerationType="class">
+        <attribute name="amount" optional="YES" attributeType="Double" usesScalarValueType="YES"/>
+        <attribute name="category" optional="YES" attributeType="String"/>
+        <attribute name="currency" optional="YES" attributeType="String"/>
+        <attribute name="cycle" optional="YES" attributeType="String"/>
+        <attribute name="endDate" optional="YES" attributeType="Date"/>
+        <attribute name="id" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="name" optional="YES" attributeType="String"/>
+        <attribute name="nextRenewal" optional="YES" attributeType="Date"/>
+    </entity>
+    <elements>
+        <element name="SubscriptionEntity" positionX="160" positionY="160" width="128" height="150"/>
+    </elements>
+</model>
