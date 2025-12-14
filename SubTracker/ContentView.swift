@@ -211,7 +211,7 @@ struct SummaryView: View {
                     .foregroundStyle(.secondary)
             } else {
                 ForEach(subscriptions.upcoming) { subscription in
-                    SubscriptionRow(subscription: subscription)
+                    SubscriptionRow(subscription: subscription, highlight: "")
                         .padding(12)
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .background(.thinMaterial, in: RoundedRectangle(cornerRadius: 12, style: .continuous))
@@ -271,26 +271,54 @@ struct SubscriptionListView: View {
     @State private var editingSubscriptionID: UUID?
     @AppStorage("defaultCurrency") private var defaultCurrency = "USD"
     @AppStorage("reminderDays") private var reminderDays: Int = 3
+    @State private var categoryFilter: Subscription.Category?
+    @State private var cycleFilter: Subscription.BillingCycle?
+    @State private var sortOption: SortOption = .nearestRenewal
 
     var filtered: [Subscription] {
-        guard !searchText.isEmpty else { return subscriptions }
-        return subscriptions.filter { $0.name.lowercased().contains(searchText.lowercased()) }
+        var result = subscriptions
+
+        if let categoryFilter {
+            result = result.filter { $0.category == categoryFilter }
+        }
+
+        if let cycleFilter {
+            result = result.filter { $0.cycle == cycleFilter }
+        }
+
+        if !searchText.isEmpty {
+            let query = searchText.lowercased()
+            result = result.filter { $0.name.lowercased().contains(query) }
+        }
+
+        switch sortOption {
+        case .nearestRenewal:
+            result = result.sorted { $0.nextRenewal < $1.nextRenewal }
+        case .highestCost:
+            result = result.sorted { $0.monthlyCost > $1.monthlyCost }
+        }
+
+        return result
     }
 
     var body: some View {
         NavigationStack {
             List {
-                ForEach($subscriptions) { $subscription in
+                ForEach(filtered) { subscription in
                     NavigationLink {
-                    SubscriptionDetailView(subscription: $subscription, onSave: { updated in
-                            Task {
-                                await NotificationScheduler.shared.reschedule(subscription: updated, reminderDays: reminderDays)
+                        if let binding = binding(for: subscription.id) {
+                            SubscriptionDetailView(subscription: binding, onSave: { updated in
+                                Task {
+                                    await NotificationScheduler.shared.reschedule(subscription: updated, reminderDays: reminderDays)
+                                }
+                            }) {
+                                delete(subscription.id)
                             }
-                        }) {
-                            delete(subscription.id)
+                        } else {
+                            Text("Abonelik bulunamadı")
                         }
                     } label: {
-                        SubscriptionRow(subscription: subscription)
+                        SubscriptionRow(subscription: subscription, highlight: searchText)
                     }
                     .swipeActions(edge: .leading, allowsFullSwipe: true) {
                         Button {
@@ -300,12 +328,44 @@ struct SubscriptionListView: View {
                         }
                         .tint(.blue)
                     }
+                    .swipeActions(edge: .trailing) {
+                        Button(role: .destructive) {
+                            delete(subscription.id)
+                        } label: {
+                            Label("Sil", systemImage: "trash")
+                        }
+                    }
                 }
-                .onDelete(perform: delete)
             }
             .searchable(text: $searchText, prompt: "Abonelik ara")
             .navigationTitle("Abonelikler")
             .toolbar {
+                ToolbarItem(placement: .navigationBarLeading) {
+                    Menu {
+                        Section("Kategori") {
+                            Button("Hepsi") { categoryFilter = nil }
+                            ForEach(Subscription.Category.allCases) { category in
+                                Button(category.displayName) { categoryFilter = category }
+                                    .labelStyle(.titleAndIcon)
+                            }
+                        }
+
+                        Section("Dönem") {
+                            Button("Hepsi") { cycleFilter = nil }
+                            ForEach(Subscription.BillingCycle.allCases) { cycle in
+                                Button(cycle.title) { cycleFilter = cycle }
+                            }
+                        }
+
+                        Section("Sırala") {
+                            Button("En yakın yenileme") { sortOption = .nearestRenewal }
+                            Button("En pahalı (aylık)") { sortOption = .highestCost }
+                        }
+                    } label: {
+                        Label("Filtrele", systemImage: "line.3.horizontal.decrease.circle")
+                    }
+                }
+
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button {
                         isPresentingAdd = true
@@ -359,6 +419,11 @@ struct SubscriptionListView: View {
         guard let index = subscriptions.firstIndex(where: { $0.id == id }) else { return nil }
         return $subscriptions[index]
     }
+
+    enum SortOption {
+        case nearestRenewal
+        case highestCost
+    }
 }
 
 struct SummaryCard: View {
@@ -383,6 +448,7 @@ struct SummaryCard: View {
 
 struct SubscriptionRow: View {
     let subscription: Subscription
+    let highlight: String
 
     var body: some View {
         HStack(spacing: 12) {
@@ -396,7 +462,7 @@ struct SubscriptionRow: View {
                 )
 
             VStack(alignment: .leading, spacing: 4) {
-                Text(subscription.name)
+                highlightedName(subscription.name, query: highlight)
                     .font(.headline)
                 Text("\(subscription.category.displayName) • \(subscription.cycle.title)")
                     .font(.subheadline)
@@ -414,6 +480,20 @@ struct SubscriptionRow: View {
             }
         }
         .padding(.vertical, 4)
+    }
+
+    private func highlightedName(_ text: String, query: String) -> Text {
+        let trimmed = query.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty else { return Text(text) }
+        let lowerText = text.lowercased()
+        let lowerQuery = trimmed.lowercased()
+        guard let range = lowerText.range(of: lowerQuery) else { return Text(text) }
+        let startIndex = range.lowerBound
+        let endIndex = range.upperBound
+        let prefix = String(text[..<startIndex])
+        let match = String(text[startIndex..<endIndex])
+        let suffix = String(text[endIndex...])
+        return Text(prefix) + Text(match).bold() + Text(suffix)
     }
 }
 
