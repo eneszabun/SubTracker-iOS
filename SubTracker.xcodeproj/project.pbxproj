@@ -14,12 +14,13 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		7E3B3F5F2A9A5E5A00DCCA20 /* SubTracker.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SubTracker.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		1312D35C2EEEE6640075B3CC /* SubTracker.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = SubTracker.entitlements; sourceTree = "<group>"; };
 		7E3B3F5F2A9A5E5A00DCCA04 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		7E3B3F5F2A9A5E5A00DCCA06 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		7E3B3F5F2A9A5E5A00DCCA08 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		7E3B3F5F2A9A5E5A00DCCA09 /* SubTrackerApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubTrackerApp.swift; sourceTree = "<group>"; };
 		7E3B3F5F2A9A5E5A00DCCA0A /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
+		7E3B3F5F2A9A5E5A00DCCA20 /* SubTracker.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SubTracker.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -52,6 +53,7 @@
 		7E3B3F5F2A9A5E5A00DCCA03 /* SubTracker */ = {
 			isa = PBXGroup;
 			children = (
+				1312D35C2EEEE6640075B3CC /* SubTracker.entitlements */,
 				7E3B3F5F2A9A5E5A00DCCA09 /* SubTrackerApp.swift */,
 				7E3B3F5F2A9A5E5A00DCCA08 /* ContentView.swift */,
 				7E3B3F5F2A9A5E5A00DCCA04 /* Assets.xcassets */,
@@ -152,9 +154,10 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = SubTracker/SubTracker.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = FJKCQ5MNZ8;
 				INFOPLIST_FILE = SubTracker/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -175,9 +178,10 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = SubTracker/SubTracker.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = FJKCQ5MNZ8;
 				INFOPLIST_FILE = SubTracker/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LD_RUNPATH_SEARCH_PATHS = (
