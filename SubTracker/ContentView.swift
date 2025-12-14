@@ -61,8 +61,8 @@ struct Subscription: Identifiable, Codable, Equatable {
         amount / cycle.months
     }
 
-    var amountForCycleMonth: Double {
-        cycle == .monthly ? amount : amount / 12
+    var amountForCycle: Double {
+        amount
     }
 
     var formattedAmount: String {
@@ -151,7 +151,9 @@ struct ContentView: View {
         .animation(.easeInOut, value: auth.isSignedIn)
         .onChange(of: subscriptions, initial: false) { _, newValue in
             SubscriptionStore.shared.save(newValue)
-            NotificationScheduler.shared.syncAll(subscriptions: newValue, reminderDays: reminderDays)
+            Task {
+                await NotificationScheduler.shared.syncAll(subscriptions: newValue, reminderDays: reminderDays)
+            }
         }
         .preferredColorScheme(preferredScheme)
     }
@@ -184,7 +186,7 @@ struct SummaryView: View {
 
     private var totalCards: some View {
         let monthly = subscriptions.monthlyTotal
-        let yearly = subscriptions.yearlyTotal
+        let yearly = monthlyBreakdown.reduce(0) { $0 + $1.total }
         let formatter = NumberFormatter()
         formatter.numberStyle = .currency
         formatter.currencyCode = defaultCurrency
@@ -225,23 +227,29 @@ struct SummaryView: View {
         var buckets: [String: MonthlyCost] = [:]
 
         for subscription in subscriptions {
-            var next = subscription.nextRenewal
             let stepMonths = subscription.cycle == .monthly ? 1 : 12
+            var next = subscription.nextRenewal
+
+            // ileriye sar: ilk tarih görünür aralıktan küçükse, ileri taşı
+            while next < startOfMonth {
+                guard let advanced = calendar.date(byAdding: .month, value: stepMonths, to: next) else { break }
+                next = advanced
+            }
+
             while next <= horizon {
                 if let end = subscription.endDate, next > end { break }
                 let key = monthKey(for: next, calendar: calendar)
+                let amount = subscription.amountForCycle
                 if let existing = buckets[key] {
-                    buckets[key] = MonthlyCost(date: existing.date, total: existing.total + subscription.amountForCycleMonth)
+                    buckets[key] = MonthlyCost(date: existing.date, total: existing.total + amount)
                 } else {
-                    buckets[key] = MonthlyCost(date: monthDate(for: next, calendar: calendar), total: subscription.amountForCycleMonth)
+                    buckets[key] = MonthlyCost(date: monthDate(for: next, calendar: calendar), total: amount)
                 }
                 guard let newDate = calendar.date(byAdding: .month, value: stepMonths, to: next) else { break }
                 next = newDate
             }
         }
 
-        let result = buckets.values.sorted { $0.date < $1.date }
-        // Ensure 12 months even if empty
         var filled: [MonthlyCost] = []
         for offset in 0..<12 {
             guard let monthDate = calendar.date(byAdding: .month, value: offset, to: startOfMonth) else { continue }
@@ -274,8 +282,10 @@ struct SubscriptionListView: View {
             List {
                 ForEach($subscriptions) { $subscription in
                     NavigationLink {
-                        SubscriptionDetailView(subscription: $subscription, onSave: { updated in
-                            NotificationScheduler.shared.reschedule(subscription: updated, reminderDays: reminderDays)
+                    SubscriptionDetailView(subscription: $subscription, onSave: { updated in
+                            Task {
+                                await NotificationScheduler.shared.reschedule(subscription: updated, reminderDays: reminderDays)
+                            }
                         }) {
                             delete(subscription.id)
                         }
@@ -308,14 +318,18 @@ struct SubscriptionListView: View {
             .sheet(isPresented: $isPresentingAdd) {
                 NewSubscriptionSheet(defaultCurrency: defaultCurrency) { newSubscription in
                     subscriptions.append(newSubscription)
-                    NotificationScheduler.shared.schedule(subscription: newSubscription, reminderDays: reminderDays)
+                    Task {
+                        await NotificationScheduler.shared.schedule(subscription: newSubscription, reminderDays: reminderDays)
+                    }
                 }
             }
             .sheet(item: $editingSubscriptionID) { id in
                 if let binding = binding(for: id) {
                     NavigationStack {
                         SubscriptionDetailView(subscription: binding, onSave: { updated in
-                            NotificationScheduler.shared.reschedule(subscription: updated, reminderDays: reminderDays)
+                            Task {
+                                await NotificationScheduler.shared.reschedule(subscription: updated, reminderDays: reminderDays)
+                            }
                         }) {
                             delete(id)
                             editingSubscriptionID = nil
@@ -329,13 +343,15 @@ struct SubscriptionListView: View {
     private func delete(_ offsets: IndexSet) {
         let ids = offsets.map { subscriptions[$0].id }
         subscriptions.remove(atOffsets: offsets)
-        ids.forEach { NotificationScheduler.shared.cancel(for: $0) }
+        ids.forEach { id in
+            Task { await NotificationScheduler.shared.cancel(for: id) }
+        }
     }
 
     private func delete(_ id: UUID) {
         if let index = subscriptions.firstIndex(where: { $0.id == id }) {
             subscriptions.remove(at: index)
-            NotificationScheduler.shared.cancel(for: id)
+            Task { await NotificationScheduler.shared.cancel(for: id) }
         }
     }
 
@@ -392,7 +408,7 @@ struct SubscriptionRow: View {
             VStack(alignment: .trailing, spacing: 4) {
                 Text(subscription.formattedAmount)
                     .font(.headline)
-                Text(subscription.nextRenewal, style: .date)
+                Text(subscription.nextRenewal.formatted(Date.FormatStyle(date: .abbreviated, time: .omitted, locale: Locale(identifier: "tr_TR"))))
                     .font(.footnote)
                     .foregroundStyle(.secondary)
             }
@@ -589,9 +605,10 @@ struct NewSubscriptionSheet: View {
                     }
 
                     DatePicker("Sonraki yenileme", selection: $draft.nextRenewal, displayedComponents: .date)
+                        .environment(\.locale, Locale(identifier: "tr_TR"))
                     Toggle("İptal/Bitiş tarihi var", isOn: $draft.hasEndDate)
                     if draft.hasEndDate {
-                        DatePicker("Bitiş tarihi", selection: $draft.endDate, displayedComponents: .date)
+                        DatePicker("Bitiş tarihi", selection: $draft.endDate, in: draft.nextRenewal..., displayedComponents: .date)
                             .environment(\.locale, Locale(identifier: "tr_TR"))
                     }
                 }
@@ -720,9 +737,10 @@ struct SubscriptionDetailView: View {
                     }
                 }
                 DatePicker("Sonraki yenileme", selection: $nextRenewal, displayedComponents: .date)
+                    .environment(\.locale, Locale(identifier: "tr_TR"))
                 Toggle("İptal/Bitiş tarihi var", isOn: $hasEndDate)
                 if hasEndDate {
-                    DatePicker("Bitiş tarihi", selection: $endDate, displayedComponents: .date)
+                    DatePicker("Bitiş tarihi", selection: $endDate, in: nextRenewal..., displayedComponents: .date)
                         .environment(\.locale, Locale(identifier: "tr_TR"))
                 }
             }
@@ -829,6 +847,7 @@ struct YearlyBreakdownView: View {
     let breakdown: [MonthlyCost]
     let currencyCode: String
     let yearlyTotal: Double
+    @State private var selectedMonth: MonthlyCost?
 
     var body: some View {
         ScrollView {
@@ -841,10 +860,63 @@ struct YearlyBreakdownView: View {
                         y: .value("Tutar", item.total)
                     )
                     .foregroundStyle(.purple)
+                    if let selectedMonth, selectedMonth.id == item.id {
+                        RuleMark(x: .value("Ay", item.monthLabel))
+                            .foregroundStyle(.gray.opacity(0.4))
+                        PointMark(
+                            x: .value("Ay", item.monthLabel),
+                            y: .value("Tutar", item.total)
+                        )
+                        .annotation(position: .overlay, alignment: .top) {
+                            Text(formattedAmount(item.total))
+                                .font(.caption.bold())
+                                .padding(6)
+                                .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 8))
+                        }
+                    }
                 }
                 .frame(height: 260)
                 .chartYAxisLabel("Tutar")
                 .chartXAxisLabel("Ay")
+                .chartOverlay { proxy in
+                    GeometryReader { geo in
+                        ZStack(alignment: .topLeading) {
+                            Rectangle()
+                                .fill(.clear)
+                                .contentShape(Rectangle())
+                                .gesture(
+                                    DragGesture(minimumDistance: 0)
+                                        .onChanged { value in
+                                            let plotFrame = geo[proxy.plotAreaFrame]
+                                            let origin = plotFrame.origin
+                                            let location = CGPoint(x: value.location.x - origin.x, y: value.location.y - origin.y)
+                                            guard plotFrame.contains(value.location) else {
+                                                selectedMonth = nil
+                                                return
+                                            }
+                                            if let month: String = proxy.value(atX: location.x) {
+                                                selectedMonth = breakdown.first { $0.monthLabel == month }
+                                            }
+                                        }
+                                        .onEnded { _ in
+                                            selectedMonth = nil
+                                        }
+                                )
+
+                            if let selectedMonth,
+                               let positionX = proxy.position(forX: selectedMonth.monthLabel) {
+                                let frame = geo[proxy.plotAreaFrame]
+                                let tooltipX = frame.origin.x + positionX - 40
+                                let tooltipY = frame.origin.y + frame.height * 0.1
+                                Text(formattedAmount(selectedMonth.total))
+                                    .font(.caption.bold())
+                                    .padding(6)
+                                    .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 8))
+                                    .offset(x: tooltipX, y: tooltipY)
+                            }
+                        }
+                    }
+                }
 
                 Text("Toplam yıllık tahmini: \(yearlyText)")
                     .font(.subheadline)
@@ -853,6 +925,9 @@ struct YearlyBreakdownView: View {
             .padding()
         }
         .navigationTitle("Yıllık Detay")
+        .onDisappear {
+            selectedMonth = nil
+        }
     }
 
     private var yearlyText: String {
@@ -860,6 +935,13 @@ struct YearlyBreakdownView: View {
         formatter.numberStyle = .currency
         formatter.currencyCode = currencyCode
         return formatter.string(from: yearlyTotal as NSNumber) ?? "-"
+    }
+
+    private func formattedAmount(_ value: Double) -> String {
+        let formatter = NumberFormatter()
+        formatter.numberStyle = .currency
+        formatter.currencyCode = currencyCode
+        return formatter.string(from: value as NSNumber) ?? "\(value)"
     }
 }
 
@@ -891,7 +973,7 @@ actor NotificationScheduler {
     static let shared = NotificationScheduler()
     private let center = UNUserNotificationCenter.current()
 
-    nonisolated func requestAuthorization() async {
+    func requestAuthorization() async {
         do {
             _ = try await center.requestAuthorization(options: [.alert, .badge, .sound])
         } catch {
@@ -899,31 +981,23 @@ actor NotificationScheduler {
         }
     }
 
-    nonisolated func schedule(subscription: Subscription, reminderDays: Int) {
-        Task {
+    func schedule(subscription: Subscription, reminderDays: Int) async {
+        await scheduleInternal(subscription: subscription, reminderDays: reminderDays)
+    }
+
+    func reschedule(subscription: Subscription, reminderDays: Int) async {
+        await cancelInternal(for: subscription.id)
+        await scheduleInternal(subscription: subscription, reminderDays: reminderDays)
+    }
+
+    func cancel(for id: UUID) async {
+        await cancelInternal(for: id)
+    }
+
+    func syncAll(subscriptions: [Subscription], reminderDays: Int) async {
+        await center.removeAllPendingNotificationRequests()
+        for subscription in subscriptions {
             await scheduleInternal(subscription: subscription, reminderDays: reminderDays)
-        }
-    }
-
-    nonisolated func reschedule(subscription: Subscription, reminderDays: Int) {
-        Task {
-            await cancelInternal(for: subscription.id)
-            await scheduleInternal(subscription: subscription, reminderDays: reminderDays)
-        }
-    }
-
-    nonisolated func cancel(for id: UUID) {
-        Task {
-            await cancelInternal(for: id)
-        }
-    }
-
-    nonisolated func syncAll(subscriptions: [Subscription], reminderDays: Int) {
-        Task {
-            await center.removeAllPendingNotificationRequests()
-            for subscription in subscriptions {
-                await scheduleInternal(subscription: subscription, reminderDays: reminderDays)
-            }
         }
     }
 
@@ -941,18 +1015,23 @@ actor NotificationScheduler {
         let calendar = Calendar.current
         let now = Date()
 
-        if let reminderDate = calendar.date(byAdding: .day, value: -reminderDays, to: subscription.nextRenewal),
+        if reminderDays > 0,
+           let reminderDate = calendar.date(byAdding: .day, value: -reminderDays, to: subscription.nextRenewal),
            reminderDate > now {
-            let content = contentBase.copy() as! UNMutableNotificationContent
+            var content = UNMutableNotificationContent()
+            content.title = contentBase.title
             content.body = "\(reminderDays) gün sonra yenileniyor. Tutar: \(amountText)"
+            content.sound = .default
             let trigger = UNCalendarNotificationTrigger(dateMatching: calendar.dateComponents([.year, .month, .day, .hour, .minute], from: reminderDate), repeats: false)
             let request = UNNotificationRequest(identifier: identifiers.reminder, content: content, trigger: trigger)
             try? await center.add(request)
         }
 
         if subscription.nextRenewal > now {
-            let content = contentBase.copy() as! UNMutableNotificationContent
+            var content = UNMutableNotificationContent()
+            content.title = contentBase.title
             content.body = "Bugün yenileniyor. Tutar: \(amountText)"
+            content.sound = .default
             let trigger = UNCalendarNotificationTrigger(dateMatching: calendar.dateComponents([.year, .month, .day, .hour, .minute], from: subscription.nextRenewal), repeats: false)
             let request = UNNotificationRequest(identifier: identifiers.renewal, content: content, trigger: trigger)
             try? await center.add(request)
