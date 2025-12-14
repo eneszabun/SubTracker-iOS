@@ -11,6 +11,9 @@
 		7E3B3F5F2A9A5E5A00DCCAB2 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E3B3F5F2A9A5E5A00DCCA08 /* ContentView.swift */; };
 		7E3B3F5F2A9A5E5A00DCCAB3 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 7E3B3F5F2A9A5E5A00DCCA04 /* Assets.xcassets */; };
 		7E3B3F5F2A9A5E5A00DCCAB4 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 7E3B3F5F2A9A5E5A00DCCA0A /* Preview Assets.xcassets */; };
+		BEF6A6AB2CFECC0B0030A1C1 /* SubscriptionEntity+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEF6A6A82CFECC0B0030A1C1 /* SubscriptionEntity+CoreDataClass.swift */; };
+		BEF6A6AC2CFECC0B0030A1C1 /* SubscriptionEntity+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEF6A6A92CFECC0B0030A1C1 /* SubscriptionEntity+CoreDataProperties.swift */; };
+		BEF6A6AD2CFECC0B0030A1C1 /* SubTracker.xcdatamodeld in Resources */ = {isa = PBXBuildFile; fileRef = BEF6A6AA2CFECC0B0030A1C1 /* SubTracker.xcdatamodeld */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -21,6 +24,9 @@
 		7E3B3F5F2A9A5E5A00DCCA09 /* SubTrackerApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubTrackerApp.swift; sourceTree = "<group>"; };
 		7E3B3F5F2A9A5E5A00DCCA0A /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		7E3B3F5F2A9A5E5A00DCCA20 /* SubTracker.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SubTracker.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		BEF6A6A82CFECC0B0030A1C1 /* SubscriptionEntity+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SubscriptionEntity+CoreDataClass.swift"; sourceTree = "<group>"; };
+		BEF6A6A92CFECC0B0030A1C1 /* SubscriptionEntity+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SubscriptionEntity+CoreDataProperties.swift"; sourceTree = "<group>"; };
+		BEF6A6AA2CFECC0B0030A1C1 /* SubTracker.xcdatamodeld */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodeld; path = SubTracker.xcdatamodeld; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -56,6 +62,9 @@
 				1312D35C2EEEE6640075B3CC /* SubTracker.entitlements */,
 				7E3B3F5F2A9A5E5A00DCCA09 /* SubTrackerApp.swift */,
 				7E3B3F5F2A9A5E5A00DCCA08 /* ContentView.swift */,
+				BEF6A6A82CFECC0B0030A1C1 /* SubscriptionEntity+CoreDataClass.swift */,
+				BEF6A6A92CFECC0B0030A1C1 /* SubscriptionEntity+CoreDataProperties.swift */,
+				BEF6A6AA2CFECC0B0030A1C1 /* SubTracker.xcdatamodeld */,
 				7E3B3F5F2A9A5E5A00DCCA04 /* Assets.xcassets */,
 				7E3B3F5F2A9A5E5A00DCCA0B /* Preview Content */,
 				7E3B3F5F2A9A5E5A00DCCA06 /* Info.plist */,
@@ -131,6 +140,7 @@
 			files = (
 				7E3B3F5F2A9A5E5A00DCCAB3 /* Assets.xcassets in Resources */,
 				7E3B3F5F2A9A5E5A00DCCAB4 /* Preview Assets.xcassets in Resources */,
+				BEF6A6AD2CFECC0B0030A1C1 /* SubTracker.xcdatamodeld in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -143,6 +153,8 @@
 			files = (
 				7E3B3F5F2A9A5E5A00DCCAB1 /* SubTrackerApp.swift in Sources */,
 				7E3B3F5F2A9A5E5A00DCCAB2 /* ContentView.swift in Sources */,
+				BEF6A6AB2CFECC0B0030A1C1 /* SubscriptionEntity+CoreDataClass.swift in Sources */,
+				BEF6A6AC2CFECC0B0030A1C1 /* SubscriptionEntity+CoreDataProperties.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
