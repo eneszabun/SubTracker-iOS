@@ -54,7 +54,7 @@ struct Subscription: Identifiable, Codable, Equatable {
     var category: Category
 
     var icon: String {
-        SubscriptionIconProvider.iconName(for: name, category: category)
+        SubscriptionIconProvider.iconName(for: category)
     }
 
     var monthlyCost: Double {
@@ -63,6 +63,11 @@ struct Subscription: Identifiable, Codable, Equatable {
 
     var amountForCycle: Double {
         amount
+    }
+
+    var isActive: Bool {
+        guard let end = endDate else { return true }
+        return end >= Date()
     }
 
     var formattedAmount: String {
@@ -74,14 +79,14 @@ struct Subscription: Identifiable, Codable, Equatable {
 }
 
 extension Array where Element == Subscription {
-    var monthlyTotal: Double { reduce(0) { $0 + $1.monthlyCost } }
+    var monthlyTotal: Double { reduce(0) { $0 + ($1.isActive ? $1.monthlyCost : 0) } }
 
-    var yearlyTotal: Double { reduce(0) { $0 + ($1.monthlyCost * 12) } }
+    var yearlyTotal: Double { reduce(0) { $0 + ($1.isActive ? ($1.monthlyCost * 12) : 0) } }
 
     var upcoming: [Subscription] {
         let now = Date()
         let horizon = Calendar.current.date(byAdding: .day, value: 14, to: now) ?? now
-        return filter { $0.nextRenewal <= horizon }.sorted { $0.nextRenewal < $1.nextRenewal }
+        return filter { $0.isActive && $0.nextRenewal <= horizon }.sorted { $0.nextRenewal < $1.nextRenewal }
     }
 }
 
@@ -176,6 +181,7 @@ struct SummaryView: View {
             ScrollView {
                 VStack(alignment: .leading, spacing: 24) {
                     totalCards
+                    analyticsSection
                     upcomingSection
                 }
                 .padding()
@@ -216,6 +222,43 @@ struct SummaryView: View {
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .background(.thinMaterial, in: RoundedRectangle(cornerRadius: 12, style: .continuous))
                 }
+            }
+        }
+    }
+
+    private var analyticsSection: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text("Analitik")
+                .font(.headline)
+
+            HStack(spacing: 12) {
+                AnalyticsCard(title: "Son 30 gün", value: formattedAmount(next30Total), color: .teal)
+                AnalyticsCard(title: "Son 90 gün", value: formattedAmount(next90Total), color: .indigo)
+            }
+
+            HStack(spacing: 12) {
+                AnalyticsCard(title: "İptal tasarrufu (aylık)", value: formattedAmount(canceledSavingsMonthly), color: .green)
+                AnalyticsCard(title: "Aktif abonelik", value: "\(activeCount)", color: .orange)
+            }
+
+            if !topFive.isEmpty {
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("En pahalı 5")
+                        .font(.subheadline.bold())
+                    ForEach(topFive) { subscription in
+                        HStack {
+                            Text(subscription.name)
+                                .font(.body)
+                            Spacer()
+                            Text(formattedAmount(subscription.monthlyCost))
+                                .font(.body.bold())
+                        }
+                        .padding(.vertical, 4)
+                        Divider()
+                    }
+                }
+                .padding()
+                .background(.thinMaterial, in: RoundedRectangle(cornerRadius: 12, style: .continuous))
             }
         }
     }
@@ -261,6 +304,44 @@ struct SummaryView: View {
             }
         }
         return filled
+    }
+
+    private var topFive: [Subscription] {
+        subscriptions.filter { $0.isActive }.sorted { $0.monthlyCost > $1.monthlyCost }.prefix(5).map { $0 }
+    }
+
+    private var next30Total: Double {
+        let horizon = Calendar.current.date(byAdding: .day, value: 30, to: Date()) ?? Date()
+        return subscriptions.reduce(0) { acc, sub in
+            guard sub.isActive, sub.nextRenewal <= horizon else { return acc }
+            return acc + sub.amountForCycle
+        }
+    }
+
+    private var next90Total: Double {
+        let horizon = Calendar.current.date(byAdding: .day, value: 90, to: Date()) ?? Date()
+        return subscriptions.reduce(0) { acc, sub in
+            guard sub.isActive, sub.nextRenewal <= horizon else { return acc }
+            return acc + sub.amountForCycle
+        }
+    }
+
+    private var canceledSavingsMonthly: Double {
+        let now = Date()
+        return subscriptions
+            .filter { ($0.endDate ?? now) < now }
+            .reduce(0) { $0 + $1.monthlyCost }
+    }
+
+    private var activeCount: Int {
+        subscriptions.filter { $0.isActive }.count
+    }
+
+    private func formattedAmount(_ value: Double) -> String {
+        let formatter = NumberFormatter()
+        formatter.numberStyle = .currency
+        formatter.currencyCode = defaultCurrency
+        return formatter.string(from: value as NSNumber) ?? "\(value)"
     }
 }
 
@@ -432,17 +513,36 @@ struct SummaryCard: View {
     let color: Color
 
     var body: some View {
-        VStack(alignment: .center, spacing: 8) {
+        VStack(alignment: .leading, spacing: 8) {
             Text(title)
                 .font(.headline)
                 .foregroundStyle(.secondary)
             Text(value)
                 .font(.title2.bold())
-                .multilineTextAlignment(.center)
+                .multilineTextAlignment(.leading)
         }
-        .frame(maxWidth: .infinity, minHeight: 90, alignment: .center)
-        .padding(.vertical, 14)
+        .frame(maxWidth: .infinity, minHeight: 90, alignment: .leading)
+        .padding(12)
         .background(color.opacity(0.16), in: RoundedRectangle(cornerRadius: 14, style: .continuous))
+    }
+}
+
+struct AnalyticsCard: View {
+    let title: String
+    let value: String
+    let color: Color
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            Text(title)
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
+            Text(value)
+                .font(.title3.bold())
+        }
+        .frame(maxWidth: .infinity, minHeight: 90, alignment: .leading)
+        .padding(12)
+        .background(color.opacity(0.15), in: RoundedRectangle(cornerRadius: 12, style: .continuous))
     }
 }
 
@@ -453,12 +553,12 @@ struct SubscriptionRow: View {
     var body: some View {
         HStack(spacing: 12) {
             Circle()
-                .fill(subscription.category.color.opacity(0.15))
+                .fill(subscription.category.color.opacity(subscription.isActive ? 0.15 : 0.08))
                 .frame(width: 44, height: 44)
                 .overlay(
                     Image(systemName: subscription.icon)
                         .font(.system(size: 18, weight: .medium))
-                        .foregroundStyle(subscription.category.color)
+                        .foregroundStyle(subscription.category.color.opacity(subscription.isActive ? 1.0 : 0.35))
                 )
 
             VStack(alignment: .leading, spacing: 4) {
@@ -1130,45 +1230,10 @@ actor NotificationScheduler {
 }
 
 enum SubscriptionIconProvider {
-    static func iconName(for name: String, category: Subscription.Category) -> String {
-        let lower = name.lowercased()
-        let map: [(keyword: String, symbol: String)] = [
-            ("netflix", "film.fill"),
-            ("prime", "play.tv"),
-            ("disney", "sparkles.tv"),
-            ("hbo", "tv"),
-            ("youtube", "play.rectangle.fill"),
-            ("spotify", "music.note.list"),
-            ("music", "music.quarternote.3"),
-            ("icloud", "icloud.fill"),
-            ("drive", "externaldrive.fill.badge.icloud"),
-            ("dropbox", "shippingbox.fill"),
-            ("google one", "circle.grid.2x2"),
-            ("notion", "note.text"),
-            ("figma", "square.on.square"),
-            ("adobe", "paintbrush.pointed.fill"),
-            ("canva", "paintpalette.fill"),
-            ("microsoft", "square.grid.3x3.square"),
-            ("office", "square.grid.3x3.square"),
-            ("ps", "gamecontroller.fill"),
-            ("playstation", "gamecontroller.fill"),
-            ("xbox", "gamecontroller.fill"),
-            ("nintendo", "gamecontroller.fill"),
-            ("vpn", "lock.shield.fill"),
-            ("nord", "lock.shield.fill"),
-            ("express", "lock.shield.fill"),
-            ("nytimes", "newspaper.fill"),
-            ("wsj", "newspaper.fill"),
-            ("twitch", "bubble.left.and.bubble.right.fill")
-        ]
-
-        if let match = map.first(where: { lower.contains($0.keyword) }) {
-            return match.symbol
-        }
-
+    static func iconName(for category: Subscription.Category) -> String {
         switch category {
         case .video: return "tv"
-        case .music: return "music.note"
+        case .music: return "music.note.list"
         case .productivity: return "square.and.pencil"
         case .storage: return "externaldrive.fill"
         case .utilities: return "gearshape.fill"
