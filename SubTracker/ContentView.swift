@@ -107,6 +107,7 @@ final class AuthViewModel: ObservableObject {
 struct ContentView: View {
     @StateObject private var auth = AuthViewModel()
     @State private var subscriptions: [Subscription]
+    @AppStorage("colorSchemePreference") private var colorSchemePreference: String = "system"
 
     init(initialSubscriptions: [Subscription] = []) {
         let stored = SubscriptionStore.shared.load()
@@ -139,6 +140,15 @@ struct ContentView: View {
         .animation(.easeInOut, value: auth.isSignedIn)
         .onChange(of: subscriptions) { newValue in
             SubscriptionStore.shared.save(newValue)
+        }
+        .preferredColorScheme(preferredScheme)
+    }
+
+    private var preferredScheme: ColorScheme? {
+        switch colorSchemePreference {
+        case "light": return .light
+        case "dark": return .dark
+        default: return nil
         }
     }
 }
@@ -196,6 +206,7 @@ struct SubscriptionListView: View {
     @Binding var subscriptions: [Subscription]
     @State private var searchText = ""
     @State private var isPresentingAdd = false
+    @State private var editingSubscriptionID: UUID?
     @AppStorage("defaultCurrency") private var defaultCurrency = "USD"
 
     var filtered: [Subscription] {
@@ -213,6 +224,14 @@ struct SubscriptionListView: View {
                         }
                     } label: {
                         SubscriptionRow(subscription: subscription)
+                    }
+                    .swipeActions(edge: .leading, allowsFullSwipe: true) {
+                        Button {
+                            editingSubscriptionID = subscription.id
+                        } label: {
+                            Label("Düzenle", systemImage: "square.and.pencil")
+                        }
+                        .tint(.blue)
                     }
                 }
                 .onDelete(perform: delete)
@@ -234,6 +253,16 @@ struct SubscriptionListView: View {
                     subscriptions.append(newSubscription)
                 }
             }
+            .sheet(item: $editingSubscriptionID) { id in
+                if let binding = binding(for: id) {
+                    NavigationStack {
+                        SubscriptionDetailView(subscription: binding) {
+                            delete(id)
+                            editingSubscriptionID = nil
+                        }
+                    }
+                }
+            }
         }
     }
 
@@ -245,6 +274,11 @@ struct SubscriptionListView: View {
         if let index = subscriptions.firstIndex(where: { $0.id == id }) {
             subscriptions.remove(at: index)
         }
+    }
+
+    private func binding(for id: UUID) -> Binding<Subscription>? {
+        guard let index = subscriptions.firstIndex(where: { $0.id == id }) else { return nil }
+        return $subscriptions[index]
     }
 }
 
@@ -681,6 +715,10 @@ private extension String {
     var doubleValue: Double? { Double(self) }
 }
 
+extension UUID: Identifiable {
+    public var id: UUID { self }
+}
+
 struct SubscriptionStore {
     static let shared = SubscriptionStore()
     private let fileURL: URL
@@ -757,12 +795,22 @@ struct SettingsView: View {
     @ObservedObject var auth: AuthViewModel
     @AppStorage("defaultCurrency") private var defaultCurrency = "USD"
     @AppStorage("reminderDays") private var reminderDays: Int = 3
+    @AppStorage("colorSchemePreference") private var colorSchemePreference: String = "system"
 
     private let currencies = ["USD", "EUR", "GBP", "TRY"]
 
     var body: some View {
         NavigationStack {
             Form {
+                Section(header: Text("Görünüm")) {
+                    Picker("Tema", selection: $colorSchemePreference) {
+                        Text("Sistem").tag("system")
+                        Text("Açık").tag("light")
+                        Text("Koyu").tag("dark")
+                    }
+                    .pickerStyle(.segmented)
+                }
+
                 Section(header: Text("Para Birimi")) {
                     Picker("Varsayilan", selection: $defaultCurrency) {
                         ForEach(currencies, id: \.self) { code in
