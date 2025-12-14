@@ -49,6 +49,7 @@ struct Subscription: Identifiable, Codable, Equatable {
     var amount: Double
     var currency: String
     var nextRenewal: Date
+    var endDate: Date?
     var cycle: BillingCycle
     var category: Category
 
@@ -58,6 +59,10 @@ struct Subscription: Identifiable, Codable, Equatable {
 
     var monthlyCost: Double {
         amount / cycle.months
+    }
+
+    var amountForCycleMonth: Double {
+        cycle == .monthly ? amount : amount / 12
     }
 
     var formattedAmount: String {
@@ -144,7 +149,7 @@ struct ContentView: View {
             }
         }
         .animation(.easeInOut, value: auth.isSignedIn)
-        .onChange(of: subscriptions) { newValue in
+        .onChange(of: subscriptions, initial: false) { _, newValue in
             SubscriptionStore.shared.save(newValue)
             NotificationScheduler.shared.syncAll(subscriptions: newValue, reminderDays: reminderDays)
         }
@@ -216,11 +221,38 @@ struct SummaryView: View {
     private var monthlyBreakdown: [MonthlyCost] {
         let calendar = Calendar.current
         let startOfMonth = calendar.date(from: calendar.dateComponents([.year, .month], from: Date())) ?? Date()
-        let monthlyTotal = subscriptions.monthlyTotal
-        return (0..<12).compactMap { offset in
-            guard let date = calendar.date(byAdding: .month, value: offset, to: startOfMonth) else { return nil }
-            return MonthlyCost(date: date, total: monthlyTotal)
+        let horizon = calendar.date(byAdding: .month, value: 12, to: startOfMonth) ?? startOfMonth
+        var buckets: [String: MonthlyCost] = [:]
+
+        for subscription in subscriptions {
+            var next = subscription.nextRenewal
+            let stepMonths = subscription.cycle == .monthly ? 1 : 12
+            while next <= horizon {
+                if let end = subscription.endDate, next > end { break }
+                let key = monthKey(for: next, calendar: calendar)
+                if let existing = buckets[key] {
+                    buckets[key] = MonthlyCost(date: existing.date, total: existing.total + subscription.amountForCycleMonth)
+                } else {
+                    buckets[key] = MonthlyCost(date: monthDate(for: next, calendar: calendar), total: subscription.amountForCycleMonth)
+                }
+                guard let newDate = calendar.date(byAdding: .month, value: stepMonths, to: next) else { break }
+                next = newDate
+            }
         }
+
+        let result = buckets.values.sorted { $0.date < $1.date }
+        // Ensure 12 months even if empty
+        var filled: [MonthlyCost] = []
+        for offset in 0..<12 {
+            guard let monthDate = calendar.date(byAdding: .month, value: offset, to: startOfMonth) else { continue }
+            let key = monthKey(for: monthDate, calendar: calendar)
+            if let existing = buckets[key] {
+                filled.append(existing)
+            } else {
+                filled.append(MonthlyCost(date: monthDate, total: 0))
+            }
+        }
+        return filled
     }
 }
 
@@ -512,7 +544,7 @@ struct NewSubscriptionSheet: View {
                 Section(header: Text("Manuel Ekle")) {
                     TextField("İsim", text: $draft.name)
                         .focused($isNameFieldFocused)
-                        .onChange(of: draft.name) { _ in }
+                        .onChange(of: draft.name, initial: false) { _, _ in }
 
                     if shouldShowSuggestions {
                         VStack(alignment: .leading, spacing: 4) {
@@ -537,7 +569,7 @@ struct NewSubscriptionSheet: View {
 
                     TextField("Tutar", text: $draft.amount)
                         .keyboardType(.numbersAndPunctuation)
-                        .onChange(of: draft.amount) { newValue in
+                        .onChange(of: draft.amount, initial: false) { _, newValue in
                             draft.amount = sanitizeAmountInput(newValue)
                         }
                     TextField("Para birimi (USD, EUR)", text: $draft.currency)
@@ -557,6 +589,11 @@ struct NewSubscriptionSheet: View {
                     }
 
                     DatePicker("Sonraki yenileme", selection: $draft.nextRenewal, displayedComponents: .date)
+                    Toggle("İptal/Bitiş tarihi var", isOn: $draft.hasEndDate)
+                    if draft.hasEndDate {
+                        DatePicker("Bitiş tarihi", selection: $draft.endDate, displayedComponents: .date)
+                            .environment(\.locale, Locale(identifier: "tr_TR"))
+                    }
                 }
 
             }
@@ -612,10 +649,13 @@ struct NewSubscriptionData {
     var cycle: Subscription.BillingCycle = .monthly
     var category: Subscription.Category = .other
     var nextRenewal: Date = Calendar.current.date(byAdding: .month, value: 1, to: Date()) ?? Date()
+    var hasEndDate: Bool = false
+    var endDate: Date = Date()
 
     func build() -> Subscription? {
         guard let amountValue = normalizedAmountValue else { return nil }
-        return Subscription(name: name, amount: amountValue, currency: currency, nextRenewal: nextRenewal, cycle: cycle, category: category)
+        let finalEndDate = hasEndDate ? endDate : nil
+        return Subscription(name: name, amount: amountValue, currency: currency, nextRenewal: nextRenewal, endDate: finalEndDate, cycle: cycle, category: category)
     }
 
     var normalizedAmountValue: Double? {
@@ -637,6 +677,8 @@ struct SubscriptionDetailView: View {
     @State private var cycle: Subscription.BillingCycle
     @State private var category: Subscription.Category
     @State private var nextRenewal: Date
+    @State private var hasEndDate: Bool
+    @State private var endDate: Date
 
     init(subscription: Binding<Subscription>, onSave: @escaping (Subscription) -> Void, onDelete: @escaping () -> Void) {
         _subscription = subscription
@@ -649,6 +691,8 @@ struct SubscriptionDetailView: View {
         _cycle = State(initialValue: value.cycle)
         _category = State(initialValue: value.category)
         _nextRenewal = State(initialValue: value.nextRenewal)
+        _hasEndDate = State(initialValue: value.endDate != nil)
+        _endDate = State(initialValue: value.endDate ?? Date())
     }
 
     var body: some View {
@@ -657,7 +701,7 @@ struct SubscriptionDetailView: View {
                 TextField("İsim", text: $name)
                 TextField("Tutar", text: $amount)
                     .keyboardType(.numbersAndPunctuation)
-                    .onChange(of: amount) { newValue in
+                    .onChange(of: amount, initial: false) { _, newValue in
                         amount = sanitizeAmountInput(newValue)
                     }
                 TextField("Para birimi", text: $currency)
@@ -676,6 +720,11 @@ struct SubscriptionDetailView: View {
                     }
                 }
                 DatePicker("Sonraki yenileme", selection: $nextRenewal, displayedComponents: .date)
+                Toggle("İptal/Bitiş tarihi var", isOn: $hasEndDate)
+                if hasEndDate {
+                    DatePicker("Bitiş tarihi", selection: $endDate, displayedComponents: .date)
+                        .environment(\.locale, Locale(identifier: "tr_TR"))
+                }
             }
 
             Section {
@@ -715,6 +764,7 @@ struct SubscriptionDetailView: View {
         subscription.cycle = cycle
         subscription.category = category
         subscription.nextRenewal = nextRenewal
+        subscription.endDate = hasEndDate ? endDate : nil
         onSave(subscription)
     }
 }
@@ -764,6 +814,15 @@ struct MonthlyCost: Identifiable {
         formatter.dateFormat = "LLL"
         return formatter.string(from: date).capitalized
     }
+}
+
+private func monthKey(for date: Date, calendar: Calendar) -> String {
+    let components = calendar.dateComponents([.year, .month], from: date)
+    return "\(components.year ?? 0)-\(components.month ?? 0)"
+}
+
+private func monthDate(for date: Date, calendar: Calendar) -> Date {
+    calendar.date(from: calendar.dateComponents([.year, .month], from: date)) ?? date
 }
 
 struct YearlyBreakdownView: View {
@@ -832,7 +891,7 @@ actor NotificationScheduler {
     static let shared = NotificationScheduler()
     private let center = UNUserNotificationCenter.current()
 
-    func requestAuthorization() async {
+    nonisolated func requestAuthorization() async {
         do {
             _ = try await center.requestAuthorization(options: [.alert, .badge, .sound])
         } catch {
@@ -840,26 +899,26 @@ actor NotificationScheduler {
         }
     }
 
-    func schedule(subscription: Subscription, reminderDays: Int) {
+    nonisolated func schedule(subscription: Subscription, reminderDays: Int) {
         Task {
             await scheduleInternal(subscription: subscription, reminderDays: reminderDays)
         }
     }
 
-    func reschedule(subscription: Subscription, reminderDays: Int) {
+    nonisolated func reschedule(subscription: Subscription, reminderDays: Int) {
         Task {
             await cancelInternal(for: subscription.id)
             await scheduleInternal(subscription: subscription, reminderDays: reminderDays)
         }
     }
 
-    func cancel(for id: UUID) {
+    nonisolated func cancel(for id: UUID) {
         Task {
             await cancelInternal(for: id)
         }
     }
 
-    func syncAll(subscriptions: [Subscription], reminderDays: Int) {
+    nonisolated func syncAll(subscriptions: [Subscription], reminderDays: Int) {
         Task {
             await center.removeAllPendingNotificationRequests()
             for subscription in subscriptions {

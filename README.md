@@ -14,7 +14,7 @@ SwiftUI tabanli, abonelik ve düzenli harcama takibi uygulamasi. Kullanici tum a
 - Kimlik: Kullanici uygulamaya ilk giriste Apple ile oturum acar; daha once girisse dogrudan ozet acilir.
 
 ## Yol Haritasi ve Yapilacaklar
-- [ ] Abonelik zaman cizelgesi: her abonelik icin iptal/bitis tarihi destegi, gercek yenileme tarihleriyle 12 aylik nakit akisi grafigi.
+- [x] Abonelik zaman cizelgesi: her abonelik icin iptal/bitis tarihi destegi, gercek yenileme tarihleriyle 12 aylik nakit akisi grafigi.
 - [x] Bildirim akisi: yenileme oncesi bildirim planlama/iptal etme, hatirlatici gun ayari.
 - [ ] Liste gelistirmeleri: kategori/yenileme filtresi, siralama (en yakin, en pahali), arama vurgusu.
 - [ ] Analitik kartlar: en pahali 5 abonelik, son 30/90 gun trendi, iptal edilenlerden kazanilan tasarruf.
