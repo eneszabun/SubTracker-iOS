@@ -23,6 +23,19 @@ SwiftUI tabanli, abonelik ve düzenli harcama takibi uygulamasi. Kullanici tum a
 - [ ] Paylasim ve disari aktarma: CSV/Paylas butonu, coklu profil veya aile paylasimi icin hazirlik.
 - [ ] UI/UX: kartlarda yenileme etiketi, detayda gecmis odemeler bolumu, iptal butonu; tema/secim tutarliligi.
 - [ ] Testler: model ve hesaplama birim testleri, bildirim planlama testi, CRUD akisi icin UI testi.
+- [ ] Gelir modeli (abonelik sistemi):
+  - Ucretsiz katman: temel abonelik ekleme/listeme, ozet ve bildirimler.
+  - Pro aylik/yillik:
+    - iCloud senkronu ve coklu profil.
+    - Ileri raporlama/metric kartlari: son 30/90 gun detayi, kategori bazli dagilim, iptal sonrasi kazanilan tasarruf trendi, birikimli nakit akisi.
+    - App Store aboneliklerini iceri aktarma: kullanicinin mevcut App Store aboneliklerini cekip listeye oneri olarak ekle (StoreKit makbuz analizi, izinli durumlarda).
+    - Premium temalar/ikonlar ve genis bildirim ufku.
+    - Destek/priority kanal.
+  - Deneme: 7 gun ucretsiz Pro denemesi, iptal olursa otomatik olarak ucretsiz katmana don.
+- [ ] Guvenlik ve gizlilik: Face ID/Touch ID ile kilit, opsiyonel parola.
+- [ ] Paylasim ve disari aktarma: CSV/Paylas butonu, coklu profil veya aile paylasimi icin hazirlik.
+- [ ] UI/UX: kartlarda yenileme etiketi, detayda gecmis odemeler bolumu, iptal butonu; tema/secim tutarliligi.
+- [ ] Testler: model ve hesaplama birim testleri, bildirim planlama testi, CRUD akisi icin UI testi.
 
 ## Mimarinin Cizgileri
 - Sunum: SwiftUI + ViewModel (ObservableObject) kombinasyonu, yalın state.
