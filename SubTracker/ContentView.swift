@@ -1,5 +1,7 @@
 import SwiftUI
 import AuthenticationServices
+import Charts
+import UserNotifications
 
 struct Subscription: Identifiable, Codable, Equatable {
     enum Category: String, CaseIterable, Identifiable, Codable, Equatable {
@@ -108,6 +110,7 @@ struct ContentView: View {
     @StateObject private var auth = AuthViewModel()
     @State private var subscriptions: [Subscription]
     @AppStorage("colorSchemePreference") private var colorSchemePreference: String = "system"
+    @AppStorage("reminderDays") private var reminderDays: Int = 3
 
     init(initialSubscriptions: [Subscription] = []) {
         let stored = SubscriptionStore.shared.load()
@@ -133,6 +136,9 @@ struct ContentView: View {
                             Label("Ayarlar", systemImage: "gearshape.fill")
                         }
                 }
+                .task {
+                    await NotificationScheduler.shared.requestAuthorization()
+                }
             } else {
                 SignInGateView(auth: auth)
             }
@@ -140,6 +146,7 @@ struct ContentView: View {
         .animation(.easeInOut, value: auth.isSignedIn)
         .onChange(of: subscriptions) { newValue in
             SubscriptionStore.shared.save(newValue)
+            NotificationScheduler.shared.syncAll(subscriptions: newValue, reminderDays: reminderDays)
         }
         .preferredColorScheme(preferredScheme)
     }
@@ -179,7 +186,12 @@ struct SummaryView: View {
 
         return HStack(spacing: 12) {
             SummaryCard(title: "Aylık", value: formatter.string(from: monthly as NSNumber) ?? "-", color: .blue)
-            SummaryCard(title: "Yıllık", value: formatter.string(from: yearly as NSNumber) ?? "-", color: .purple)
+            NavigationLink {
+                YearlyBreakdownView(breakdown: monthlyBreakdown, currencyCode: defaultCurrency, yearlyTotal: yearly)
+            } label: {
+                SummaryCard(title: "Yıllık", value: formatter.string(from: yearly as NSNumber) ?? "-", color: .purple)
+            }
+            .buttonStyle(.plain)
         }
     }
 
@@ -200,6 +212,16 @@ struct SummaryView: View {
             }
         }
     }
+
+    private var monthlyBreakdown: [MonthlyCost] {
+        let calendar = Calendar.current
+        let startOfMonth = calendar.date(from: calendar.dateComponents([.year, .month], from: Date())) ?? Date()
+        let monthlyTotal = subscriptions.monthlyTotal
+        return (0..<12).compactMap { offset in
+            guard let date = calendar.date(byAdding: .month, value: offset, to: startOfMonth) else { return nil }
+            return MonthlyCost(date: date, total: monthlyTotal)
+        }
+    }
 }
 
 struct SubscriptionListView: View {
@@ -208,6 +230,7 @@ struct SubscriptionListView: View {
     @State private var isPresentingAdd = false
     @State private var editingSubscriptionID: UUID?
     @AppStorage("defaultCurrency") private var defaultCurrency = "USD"
+    @AppStorage("reminderDays") private var reminderDays: Int = 3
 
     var filtered: [Subscription] {
         guard !searchText.isEmpty else { return subscriptions }
@@ -219,7 +242,9 @@ struct SubscriptionListView: View {
             List {
                 ForEach($subscriptions) { $subscription in
                     NavigationLink {
-                        SubscriptionDetailView(subscription: $subscription) {
+                        SubscriptionDetailView(subscription: $subscription, onSave: { updated in
+                            NotificationScheduler.shared.reschedule(subscription: updated, reminderDays: reminderDays)
+                        }) {
                             delete(subscription.id)
                         }
                     } label: {
@@ -251,12 +276,15 @@ struct SubscriptionListView: View {
             .sheet(isPresented: $isPresentingAdd) {
                 NewSubscriptionSheet(defaultCurrency: defaultCurrency) { newSubscription in
                     subscriptions.append(newSubscription)
+                    NotificationScheduler.shared.schedule(subscription: newSubscription, reminderDays: reminderDays)
                 }
             }
             .sheet(item: $editingSubscriptionID) { id in
                 if let binding = binding(for: id) {
                     NavigationStack {
-                        SubscriptionDetailView(subscription: binding) {
+                        SubscriptionDetailView(subscription: binding, onSave: { updated in
+                            NotificationScheduler.shared.reschedule(subscription: updated, reminderDays: reminderDays)
+                        }) {
                             delete(id)
                             editingSubscriptionID = nil
                         }
@@ -267,12 +295,15 @@ struct SubscriptionListView: View {
     }
 
     private func delete(_ offsets: IndexSet) {
+        let ids = offsets.map { subscriptions[$0].id }
         subscriptions.remove(atOffsets: offsets)
+        ids.forEach { NotificationScheduler.shared.cancel(for: $0) }
     }
 
     private func delete(_ id: UUID) {
         if let index = subscriptions.firstIndex(where: { $0.id == id }) {
             subscriptions.remove(at: index)
+            NotificationScheduler.shared.cancel(for: id)
         }
     }
 
@@ -595,6 +626,7 @@ struct NewSubscriptionData {
 
 struct SubscriptionDetailView: View {
     @Binding var subscription: Subscription
+    let onSave: (Subscription) -> Void
     let onDelete: () -> Void
 
     @Environment(\.dismiss) private var dismiss
@@ -606,8 +638,9 @@ struct SubscriptionDetailView: View {
     @State private var category: Subscription.Category
     @State private var nextRenewal: Date
 
-    init(subscription: Binding<Subscription>, onDelete: @escaping () -> Void) {
+    init(subscription: Binding<Subscription>, onSave: @escaping (Subscription) -> Void, onDelete: @escaping () -> Void) {
         _subscription = subscription
+        self.onSave = onSave
         self.onDelete = onDelete
         let value = subscription.wrappedValue
         _name = State(initialValue: value.name)
@@ -682,6 +715,7 @@ struct SubscriptionDetailView: View {
         subscription.cycle = cycle
         subscription.category = category
         subscription.nextRenewal = nextRenewal
+        onSave(subscription)
     }
 }
 
@@ -719,6 +753,57 @@ extension UUID: Identifiable {
     public var id: UUID { self }
 }
 
+struct MonthlyCost: Identifiable {
+    let id = UUID()
+    let date: Date
+    let total: Double
+
+    var monthLabel: String {
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "tr_TR")
+        formatter.dateFormat = "LLL"
+        return formatter.string(from: date).capitalized
+    }
+}
+
+struct YearlyBreakdownView: View {
+    let breakdown: [MonthlyCost]
+    let currencyCode: String
+    let yearlyTotal: Double
+
+    var body: some View {
+        ScrollView {
+            VStack(alignment: .leading, spacing: 16) {
+                Text("Önümüzdeki 12 ay tahmini gider")
+                    .font(.headline)
+                Chart(breakdown) { item in
+                    BarMark(
+                        x: .value("Ay", item.monthLabel),
+                        y: .value("Tutar", item.total)
+                    )
+                    .foregroundStyle(.purple)
+                }
+                .frame(height: 260)
+                .chartYAxisLabel("Tutar")
+                .chartXAxisLabel("Ay")
+
+                Text("Toplam yıllık tahmini: \(yearlyText)")
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+            }
+            .padding()
+        }
+        .navigationTitle("Yıllık Detay")
+    }
+
+    private var yearlyText: String {
+        let formatter = NumberFormatter()
+        formatter.numberStyle = .currency
+        formatter.currencyCode = currencyCode
+        return formatter.string(from: yearlyTotal as NSNumber) ?? "-"
+    }
+}
+
 struct SubscriptionStore {
     static let shared = SubscriptionStore()
     private let fileURL: URL
@@ -740,6 +825,89 @@ struct SubscriptionStore {
     func save(_ subscriptions: [Subscription]) {
         guard let data = try? JSONEncoder().encode(subscriptions) else { return }
         try? data.write(to: fileURL, options: .atomic)
+    }
+}
+
+actor NotificationScheduler {
+    static let shared = NotificationScheduler()
+    private let center = UNUserNotificationCenter.current()
+
+    func requestAuthorization() async {
+        do {
+            _ = try await center.requestAuthorization(options: [.alert, .badge, .sound])
+        } catch {
+            // ignore errors silently for now
+        }
+    }
+
+    func schedule(subscription: Subscription, reminderDays: Int) {
+        Task {
+            await scheduleInternal(subscription: subscription, reminderDays: reminderDays)
+        }
+    }
+
+    func reschedule(subscription: Subscription, reminderDays: Int) {
+        Task {
+            await cancelInternal(for: subscription.id)
+            await scheduleInternal(subscription: subscription, reminderDays: reminderDays)
+        }
+    }
+
+    func cancel(for id: UUID) {
+        Task {
+            await cancelInternal(for: id)
+        }
+    }
+
+    func syncAll(subscriptions: [Subscription], reminderDays: Int) {
+        Task {
+            await center.removeAllPendingNotificationRequests()
+            for subscription in subscriptions {
+                await scheduleInternal(subscription: subscription, reminderDays: reminderDays)
+            }
+        }
+    }
+
+    private func scheduleInternal(subscription: Subscription, reminderDays: Int) async {
+        let identifiers = identifiers(for: subscription.id)
+        await cancelInternal(for: subscription.id)
+
+        let contentBase = UNMutableNotificationContent()
+        contentBase.title = "\(subscription.name) yenilemesi"
+        let formatter = NumberFormatter()
+        formatter.numberStyle = .currency
+        formatter.currencyCode = subscription.currency
+        let amountText = formatter.string(from: subscription.amount as NSNumber) ?? ""
+
+        let calendar = Calendar.current
+        let now = Date()
+
+        if let reminderDate = calendar.date(byAdding: .day, value: -reminderDays, to: subscription.nextRenewal),
+           reminderDate > now {
+            let content = contentBase.copy() as! UNMutableNotificationContent
+            content.body = "\(reminderDays) gün sonra yenileniyor. Tutar: \(amountText)"
+            let trigger = UNCalendarNotificationTrigger(dateMatching: calendar.dateComponents([.year, .month, .day, .hour, .minute], from: reminderDate), repeats: false)
+            let request = UNNotificationRequest(identifier: identifiers.reminder, content: content, trigger: trigger)
+            try? await center.add(request)
+        }
+
+        if subscription.nextRenewal > now {
+            let content = contentBase.copy() as! UNMutableNotificationContent
+            content.body = "Bugün yenileniyor. Tutar: \(amountText)"
+            let trigger = UNCalendarNotificationTrigger(dateMatching: calendar.dateComponents([.year, .month, .day, .hour, .minute], from: subscription.nextRenewal), repeats: false)
+            let request = UNNotificationRequest(identifier: identifiers.renewal, content: content, trigger: trigger)
+            try? await center.add(request)
+        }
+    }
+
+    private func cancelInternal(for id: UUID) async {
+        let ids = identifiers(for: id)
+        center.removePendingNotificationRequests(withIdentifiers: [ids.reminder, ids.renewal])
+    }
+
+    private func identifiers(for id: UUID) -> (reminder: String, renewal: String) {
+        let base = id.uuidString
+        return ("\(base)-reminder", "\(base)-renewal")
     }
 }
 

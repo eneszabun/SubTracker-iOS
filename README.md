@@ -14,15 +14,15 @@ SwiftUI tabanli, abonelik ve düzenli harcama takibi uygulamasi. Kullanici tum a
 - Kimlik: Kullanici uygulamaya ilk giriste Apple ile oturum acar; daha once girisse dogrudan ozet acilir.
 
 ## Yol Haritasi ve Yapilacaklar
-- [ ] Minimum iskelet: SwiftUI tabanli, iki ana sekme (Ozet, Abonelikler).
-- [ ] Model: `Subscription` ve `BillingCycle` tipleri, Core Data store.
-- [ ] Ozet ekran: toplam aylik/yillik maliyet, yakin yenilemeler listesi.
-- [ ] Abonelik listesi: filtreleme (kategori/dongu), arama, surukle-sil.
-- [ ] Abonelik olustur/duzenle akisi: form dogrulama, tarih secici, para birimi secimi.
-- [ ] Bildirim planlayici: UNUserNotificationCenter entegrasyonu, izin akisi.
-- [ ] Ayarlar: para birimi varsayilani, bildirim tercihleri (yenileme once kac gun), veri yedekleme uyarisi.
-- [ ] Oturum: Sign in with Apple akisi, oturum durumu saklama ve cikis.
-- [ ] Testler: model ve hesaplama birim testleri; en az 1 UI testi (liste gosterimi).
+- [ ] Abonelik zaman cizelgesi: her abonelik icin iptal/bitis tarihi destegi, gercek yenileme tarihleriyle 12 aylik nakit akisi grafigi.
+- [x] Bildirim akisi: yenileme oncesi bildirim planlama/iptal etme, hatirlatici gun ayari.
+- [ ] Liste gelistirmeleri: kategori/yenileme filtresi, siralama (en yakin, en pahali), arama vurgusu.
+- [ ] Analitik kartlar: en pahali 5 abonelik, son 30/90 gun trendi, iptal edilenlerden kazanilan tasarruf.
+- [ ] Veri katmani: Core Data + opsiyonel iCloud senkron; JSON yerine kalici store gocmesi.
+- [ ] Guvenlik ve gizlilik: Face ID/Touch ID ile kilit, opsiyonel parola.
+- [ ] Paylasim ve disari aktarma: CSV/Paylas butonu, coklu profil veya aile paylasimi icin hazirlik.
+- [ ] UI/UX: kartlarda yenileme etiketi, detayda gecmis odemeler bolumu, iptal butonu; tema/secim tutarliligi.
+- [ ] Testler: model ve hesaplama birim testleri, bildirim planlama testi, CRUD akisi icin UI testi.
 
 ## Mimarinin Cizgileri
 - Sunum: SwiftUI + ViewModel (ObservableObject) kombinasyonu, yalın state.
