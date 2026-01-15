@@ -1,5 +1,9 @@
 import SwiftUI
 
+extension UUID: Identifiable {
+    public var id: UUID { self }
+}
+
 struct SubscriptionListView: View {
     @Binding var subscriptions: [Subscription]
     /// Spotlight'tan seçilen abonelik ID'si

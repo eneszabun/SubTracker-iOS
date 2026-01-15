@@ -18,8 +18,17 @@ struct SubscriptionDetailView: View {
     @State private var hasEndDate: Bool
     @State private var endDate: Date
     @State private var remindMe: Bool = true
+    @State private var showingNextRenewalPicker = false
+    @State private var showingEndDatePicker = false
 
     private let currencies = ["USD", "EUR", "GBP", "TRY"]
+    
+    private let dateFormatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "tr_TR")
+        formatter.dateFormat = "d MMMM yyyy"
+        return formatter
+    }()
 
     init(subscription: Binding<Subscription>, onSave: @escaping (Subscription) -> Void, onDelete: @escaping () -> Void) {
         _subscription = subscription
@@ -41,28 +50,43 @@ struct SubscriptionDetailView: View {
     }
 
     var body: some View {
-        NavigationStack {
-            ScrollView {
-                VStack(spacing: 20) {
-                    heroSection
-                    formSection
-                    reminderCard
-                    endDateSection
-                    actionButtons
-                }
-                .padding(.horizontal, 16)
-                .padding(.top, 12)
-                .padding(.bottom, 32)
+        ScrollView {
+            VStack(spacing: 20) {
+                heroSection
+                formSection
+                reminderCard
+                endDateSection
+                actionButtons
             }
-            .scrollIndicators(.hidden)
-            .background(palette.background)
-            .safeAreaInset(edge: .top, spacing: 0) {
-                header
-            }
-            .toolbar(.hidden, for: .navigationBar)
-            .onAppear {
-                remindMe = reminderDays > 0
-            }
+            .padding(.horizontal, 16)
+            .padding(.top, 12)
+            .padding(.bottom, 32)
+        }
+        .scrollIndicators(.hidden)
+        .background(palette.background)
+        .safeAreaInset(edge: .top, spacing: 0) {
+            header
+        }
+        .toolbar(.hidden, for: .navigationBar)
+        .onAppear {
+            remindMe = reminderDays > 0
+        }
+        .sheet(isPresented: $showingNextRenewalPicker) {
+            DatePickerSheet(
+                title: "İlk Ödeme Tarihi",
+                selection: $nextRenewal,
+                palette: palette
+            )
+            .presentationDetents([.height(400)])
+        }
+        .sheet(isPresented: $showingEndDatePicker) {
+            DatePickerSheet(
+                title: "Bitiş Tarihi",
+                selection: $endDate,
+                minimumDate: nextRenewal,
+                palette: palette
+            )
+            .presentationDetents([.height(400)])
         }
     }
 
@@ -168,10 +192,20 @@ struct SubscriptionDetailView: View {
 
             HStack(spacing: 12) {
                 fieldBlock(title: "İlk Ödeme") {
-                    DatePicker("", selection: $nextRenewal, displayedComponents: .date)
-                        .labelsHidden()
-                        .environment(\.locale, Locale(identifier: "tr_TR"))
-                        .foregroundStyle(palette.textPrimary)
+                    Button {
+                        showingNextRenewalPicker = true
+                    } label: {
+                        HStack {
+                            Text(dateFormatter.string(from: nextRenewal))
+                                .foregroundStyle(palette.textPrimary)
+                                .font(.system(size: 15, weight: .medium))
+                            Spacer()
+                            Image(systemName: "calendar")
+                                .font(.system(size: 14, weight: .medium))
+                                .foregroundStyle(palette.textSecondary)
+                        }
+                    }
+                    .buttonStyle(.plain)
                 }
 
                 fieldBlock(title: "Kategori") {
@@ -257,10 +291,20 @@ struct SubscriptionDetailView: View {
 
             if hasEndDate {
                 fieldBlock(title: "Bitiş Tarihi") {
-                    DatePicker("", selection: $endDate, in: nextRenewal..., displayedComponents: .date)
-                        .labelsHidden()
-                        .environment(\.locale, Locale(identifier: "tr_TR"))
-                        .foregroundStyle(palette.textPrimary)
+                    Button {
+                        showingEndDatePicker = true
+                    } label: {
+                        HStack {
+                            Text(dateFormatter.string(from: endDate))
+                                .foregroundStyle(palette.textPrimary)
+                                .font(.system(size: 15, weight: .medium))
+                            Spacer()
+                            Image(systemName: "calendar")
+                                .font(.system(size: 14, weight: .medium))
+                                .foregroundStyle(palette.textSecondary)
+                        }
+                    }
+                    .buttonStyle(.plain)
                 }
             }
         }
@@ -388,5 +432,52 @@ private struct SubscriptionDetailPalette {
     }
     var destructiveBackground: Color {
         scheme == .dark ? Color(red: 0.95, green: 0.35, blue: 0.3).opacity(0.12) : Color(red: 0.98, green: 0.9, blue: 0.9)
+    }
+}
+
+private struct DatePickerSheet: View {
+    let title: String
+    @Binding var selection: Date
+    var minimumDate: Date? = nil
+    let palette: SubscriptionDetailPalette
+    
+    @Environment(\.dismiss) private var dismiss
+    
+    var body: some View {
+        NavigationStack {
+            VStack(spacing: 0) {
+                if let minDate = minimumDate {
+                    DatePicker(
+                        "",
+                        selection: $selection,
+                        in: minDate...,
+                        displayedComponents: .date
+                    )
+                    .datePickerStyle(.graphical)
+                    .environment(\.locale, Locale(identifier: "tr_TR"))
+                    .padding()
+                } else {
+                    DatePicker(
+                        "",
+                        selection: $selection,
+                        displayedComponents: .date
+                    )
+                    .datePickerStyle(.graphical)
+                    .environment(\.locale, Locale(identifier: "tr_TR"))
+                    .padding()
+                }
+            }
+            .background(palette.background)
+            .navigationTitle(title)
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("Tamam") {
+                        dismiss()
+                    }
+                    .fontWeight(.semibold)
+                }
+            }
+        }
     }
 }

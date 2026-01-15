@@ -109,7 +109,7 @@ struct YearlyBreakdownView: View {
     }
     
     private func chartCard(isLight: Bool) -> some View {
-        let palette = isLight ? YearlyLightPalette.self : YearlyDarkPalette.self
+        let palette = YearlyPaletteValues.palette(isLight: isLight)
         
         return VStack(alignment: .leading, spacing: 20) {
             // Chart Title
@@ -147,7 +147,7 @@ struct YearlyBreakdownView: View {
     }
     
     private func customBarChart(isLight: Bool) -> some View {
-        let palette = isLight ? YearlyLightPalette.self : YearlyDarkPalette.self
+        let palette = YearlyPaletteValues.palette(isLight: isLight)
         let values = breakdown.map(\.total)
         let maxValue = values.max() ?? 0
         
@@ -202,7 +202,7 @@ struct YearlyBreakdownView: View {
     }
     
     private func monthLabels(isLight: Bool) -> some View {
-        let palette = isLight ? YearlyLightPalette.self : YearlyDarkPalette.self
+        let palette = YearlyPaletteValues.palette(isLight: isLight)
         
         return HStack(spacing: 0) {
             ForEach(breakdown.indices, id: \.self) { index in
@@ -219,7 +219,7 @@ struct YearlyBreakdownView: View {
     }
     
     private func selectedMonthCard(month: MonthlyCost, isLight: Bool) -> some View {
-        let palette = isLight ? YearlyLightPalette.self : YearlyDarkPalette.self
+        let palette = YearlyPaletteValues.palette(isLight: isLight)
         
         return HStack(spacing: 12) {
             VStack(alignment: .leading, spacing: 4) {
@@ -251,7 +251,7 @@ struct YearlyBreakdownView: View {
     }
     
     private func monthlyDetailsSection(isLight: Bool) -> some View {
-        let palette = isLight ? YearlyLightPalette.self : YearlyDarkPalette.self
+        let palette = YearlyPaletteValues.palette(isLight: isLight)
         
         return VStack(alignment: .leading, spacing: 12) {
             Text("AYLIK DETAYLAR")
@@ -273,7 +273,7 @@ struct YearlyBreakdownView: View {
     }
     
     private func monthlyDetailRow(month: MonthlyCost, index: Int, isLight: Bool) -> some View {
-        let palette = isLight ? YearlyLightPalette.self : YearlyDarkPalette.self
+        let palette = YearlyPaletteValues.palette(isLight: isLight)
         let maxTotal = breakdown.map(\.total).max() ?? 0
         let ratio = maxTotal > 0 ? month.total / maxTotal : 0
         
@@ -337,7 +337,49 @@ struct YearlyBreakdownView: View {
     }
 }
 
-// MARK: - Light Palette
+// MARK: - Palette Values Struct
+
+private struct YearlyPaletteValues {
+    let primary: Color
+    let background: Color
+    let surface: Color
+    let border: Color
+    let chartBase: Color
+    let chartEmpty: Color
+    let textPrimary: Color
+    let textMuted: Color
+    let shadow: Color
+    
+    static let light = YearlyPaletteValues(
+        primary: Color(red: 0.11, green: 0.45, blue: 0.93),
+        background: Color(red: 0.95, green: 0.96, blue: 0.97),
+        surface: Color.white,
+        border: Color(red: 0.94, green: 0.95, blue: 0.96),
+        chartBase: Color(red: 0.93, green: 0.94, blue: 0.96),
+        chartEmpty: Color(red: 0.93, green: 0.94, blue: 0.96),
+        textPrimary: Color(red: 0.10, green: 0.12, blue: 0.15),
+        textMuted: Color(red: 0.55, green: 0.59, blue: 0.64),
+        shadow: Color.black.opacity(0.05)
+    )
+    
+    static let dark = YearlyPaletteValues(
+        primary: Color(red: 0.11, green: 0.45, blue: 0.93),
+        background: Color(red: 0.06, green: 0.09, blue: 0.13),
+        surface: Color(red: 0.11, green: 0.14, blue: 0.19),
+        border: Color(red: 0.12, green: 0.16, blue: 0.23),
+        chartBase: Color.white.opacity(0.06),
+        chartEmpty: Color.white.opacity(0.06),
+        textPrimary: Color.white,
+        textMuted: Color(red: 0.58, green: 0.64, blue: 0.72),
+        shadow: Color.clear
+    )
+    
+    static func palette(isLight: Bool) -> YearlyPaletteValues {
+        isLight ? .light : .dark
+    }
+}
+
+// MARK: - Light Palette (for direct access)
 
 private enum YearlyLightPalette {
     static let primary = Color(red: 0.11, green: 0.45, blue: 0.93)
@@ -351,7 +393,7 @@ private enum YearlyLightPalette {
     static let chartEmpty = Color(red: 0.93, green: 0.94, blue: 0.96)
 }
 
-// MARK: - Dark Palette
+// MARK: - Dark Palette (for direct access)
 
 private enum YearlyDarkPalette {
     static let primary = Color(red: 0.11, green: 0.45, blue: 0.93)

@@ -27,7 +27,7 @@ actor NotificationScheduler {
     }
 
     func syncAll(subscriptions: [Subscription], reminderDays: Int) async {
-        await center.removeAllPendingNotificationRequests()
+        center.removeAllPendingNotificationRequests()
         for subscription in subscriptions {
             await scheduleInternal(subscription: subscription, reminderDays: reminderDays)
         }
@@ -52,7 +52,7 @@ actor NotificationScheduler {
         if reminderDays > 0,
            let reminderDate = calendar.date(byAdding: .day, value: -reminderDays, to: renewalDate),
            reminderDate > now {
-            var content = UNMutableNotificationContent()
+            let content = UNMutableNotificationContent()
             content.title = contentBase.title
             content.body = "\(reminderDays) gün sonra yenileniyor. Tutar: \(amountText)"
             content.sound = .default
@@ -62,7 +62,7 @@ actor NotificationScheduler {
         }
 
         if renewalDate > now {
-            var content = UNMutableNotificationContent()
+            let content = UNMutableNotificationContent()
             content.title = contentBase.title
             content.body = "Bugün yenileniyor. Tutar: \(amountText)"
             content.sound = .default

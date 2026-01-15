@@ -28,7 +28,7 @@ actor SubscriptionStore {
         legacyFileURL = base.appendingPathComponent("subscriptions.json")
     }
 
-    func load() -> [Subscription] {
+    nonisolated func load() -> [Subscription] {
         var results: [Subscription] = []
         let context = container.viewContext
         context.performAndWait {
@@ -85,7 +85,7 @@ actor SubscriptionStore {
         updateWidget(with: subscriptions)
     }
 
-    private func migrateLegacyIfNeeded() -> [Subscription] {
+    private nonisolated func migrateLegacyIfNeeded() -> [Subscription] {
         guard let data = try? Data(contentsOf: legacyFileURL),
               let decoded = try? JSONDecoder().decode([Subscription].self, from: data) else { return [] }
         Task { await save(decoded) }

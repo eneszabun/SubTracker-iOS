@@ -8,6 +8,7 @@ struct SummaryView: View {
     @Environment(\.colorScheme) private var colorScheme
     @State private var selectedPeriod: SummaryPeriod = .yearly
     @State private var isPresentingAdd = false
+    @State private var cachedMonthlyBreakdown: [MonthlyCost] = []
     
     /// Subscription ID'sine göre binding döndürür
     private func binding(for id: UUID) -> Binding<Subscription>? {
@@ -40,6 +41,12 @@ struct SummaryView: View {
                     await NotificationScheduler.shared.schedule(subscription: newSubscription, reminderDays: reminderDays)
                 }
             }
+        }
+        .onAppear {
+            cachedMonthlyBreakdown = computeMonthlyBreakdown()
+        }
+        .onChange(of: subscriptions) { _, _ in
+            cachedMonthlyBreakdown = computeMonthlyBreakdown()
         }
     }
 
@@ -155,24 +162,24 @@ struct SummaryView: View {
     }
 
     private var periodToggle: some View {
-        HStack(spacing: 0) {
+        HStack(spacing: 4) {
             ForEach(SummaryPeriod.allCases) { period in
                 Button {
-                    selectedPeriod = period
+                    withAnimation(.easeInOut(duration: 0.2)) {
+                        selectedPeriod = period
+                    }
                 } label: {
                     Text(period.title)
                         .font(.system(size: 12, weight: .semibold))
                         .foregroundStyle(selectedPeriod == period ? SummaryLightPalette.textPrimary : SummaryLightPalette.textMuted)
-                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                        .frame(maxWidth: .infinity)
+                        .frame(height: 36)
                         .background(
-                            Group {
-                                if selectedPeriod == period {
-                                    RoundedRectangle(cornerRadius: 10, style: .continuous)
-                                        .fill(SummaryLightPalette.surface)
-                                        .shadow(color: SummaryLightPalette.shadow, radius: 3, x: 0, y: 1)
-                                }
-                            }
+                            RoundedRectangle(cornerRadius: 10, style: .continuous)
+                                .fill(selectedPeriod == period ? SummaryLightPalette.surface : Color.clear)
+                                .shadow(color: selectedPeriod == period ? SummaryLightPalette.shadow : .clear, radius: 3, x: 0, y: 1)
                         )
+                        .contentShape(Rectangle())
                 }
                 .buttonStyle(.plain)
             }
@@ -183,23 +190,23 @@ struct SummaryView: View {
     }
 
     private var darkPeriodToggle: some View {
-        HStack(spacing: 0) {
+        HStack(spacing: 4) {
             ForEach(SummaryPeriod.allCases) { period in
                 Button {
-                    selectedPeriod = period
+                    withAnimation(.easeInOut(duration: 0.2)) {
+                        selectedPeriod = period
+                    }
                 } label: {
                     Text(period.title)
                         .font(.system(size: 13, weight: .semibold))
                         .foregroundStyle(selectedPeriod == period ? SummaryDarkPalette.textPrimary : SummaryDarkPalette.textMuted)
-                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                        .frame(maxWidth: .infinity)
+                        .frame(height: 40)
                         .background(
-                            Group {
-                                if selectedPeriod == period {
-                                    RoundedRectangle(cornerRadius: 10, style: .continuous)
-                                        .fill(SummaryDarkPalette.surfaceHighlight)
-                                }
-                            }
+                            RoundedRectangle(cornerRadius: 10, style: .continuous)
+                                .fill(selectedPeriod == period ? SummaryDarkPalette.surfaceHighlight : Color.clear)
                         )
+                        .contentShape(Rectangle())
                 }
                 .buttonStyle(.plain)
             }
@@ -632,6 +639,10 @@ struct SummaryView: View {
     }
 
     private var monthlyBreakdown: [MonthlyCost] {
+        cachedMonthlyBreakdown.isEmpty ? computeMonthlyBreakdown() : cachedMonthlyBreakdown
+    }
+    
+    private func computeMonthlyBreakdown() -> [MonthlyCost] {
         let calendar = Calendar.current
         let startOfMonth = calendar.date(from: calendar.dateComponents([.year, .month], from: Date())) ?? Date()
         let horizon = calendar.date(byAdding: .month, value: 12, to: startOfMonth) ?? startOfMonth

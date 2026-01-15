@@ -153,9 +153,6 @@ struct MonthlyCost: Identifiable {
     }
 }
 
-extension UUID: Identifiable {
-    public var id: UUID { self }
-}
 
 #if DEBUG
 extension Subscription {
