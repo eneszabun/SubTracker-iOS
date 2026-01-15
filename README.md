@@ -25,7 +25,7 @@ SwiftUI tabanli, abonelik ve düzenli harcama takibi uygulamasi. Kullanici tum a
 - [x] Abonelik onerileri: populer servislerin otomatik tanima ve kategori atama.
 
 ### Kisa Vadeli Hedefler (v1.1)
-- [ ] Widget destegi: ana ekranda toplam aylik gider ve yakin yenilemeler.
+- [x] Widget destegi: ana ekranda toplam aylik gider ve yakin yenilemeler.
 - [x] Spotlight entegrasyonu: abonelikleri sistem aramasindan bulma.
 - [ ] Gecmis odemeler bolumu: detay sayfasinda odeme gecmisi listesi.
 - [ ] CSV disari aktarma: abonelik listesini dosya olarak paylasma.

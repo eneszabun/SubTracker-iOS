@@ -28,7 +28,35 @@
 		BEF6A6AC2CFECC0B0030A1C1 /* SubscriptionEntity+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEF6A6A92CFECC0B0030A1C1 /* SubscriptionEntity+CoreDataProperties.swift */; };
 		BEF6A6AD2CFECC0B0030A1C1 /* SubTracker.xcdatamodeld in Resources */ = {isa = PBXBuildFile; fileRef = BEF6A6AA2CFECC0B0030A1C1 /* SubTracker.xcdatamodeld */; };
 		SP0T1IGHT2D2F3G4H5I6J7K8 /* SpotlightManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = SP0T1IGHT1A2B3C4D5E6F7G8H /* SpotlightManager.swift */; };
+		W1DG3T0001A2B3C4D5E6F7G8 /* WidgetDataManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = W1DG3T0002A2B3C4D5E6F7G8 /* WidgetDataManager.swift */; };
+		W1DG3T0003A2B3C4D5E6F7G8 /* SubTrackerWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = W1DG3T0004A2B3C4D5E6F7G8 /* SubTrackerWidget.swift */; };
+		W1DG3T0005A2B3C4D5E6F7G8 /* WidgetDataManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = W1DG3T0002A2B3C4D5E6F7G8 /* WidgetDataManager.swift */; };
+		W1DG3T0006A2B3C4D5E6F7G8 /* SubTrackerWidgetExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = W1DG3T0007A2B3C4D5E6F7G8 /* SubTrackerWidgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		W1DG3T0008A2B3C4D5E6F7G8 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 7E3B3F5F2A9A5E5A00DCCA00 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = W1DG3T0009A2B3C4D5E6F7G8;
+			remoteInfo = SubTrackerWidgetExtension;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		W1DG3T0010A2B3C4D5E6F7G8 /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				W1DG3T0006A2B3C4D5E6F7G8 /* SubTrackerWidgetExtension.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		1312D35C2EEEE6640075B3CC /* SubTracker.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = SubTracker.entitlements; sourceTree = "<group>"; };
@@ -55,10 +83,22 @@
 		BEF6A6A92CFECC0B0030A1C1 /* SubscriptionEntity+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SubscriptionEntity+CoreDataProperties.swift"; sourceTree = "<group>"; };
 		BEF6A6AA2CFECC0B0030A1C1 /* SubTracker.xcdatamodeld */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodeld; path = SubTracker.xcdatamodeld; sourceTree = "<group>"; };
 		SP0T1IGHT1A2B3C4D5E6F7G8H /* SpotlightManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpotlightManager.swift; sourceTree = "<group>"; };
+		W1DG3T0002A2B3C4D5E6F7G8 /* WidgetDataManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidgetDataManager.swift; sourceTree = "<group>"; };
+		W1DG3T0004A2B3C4D5E6F7G8 /* SubTrackerWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubTrackerWidget.swift; sourceTree = "<group>"; };
+		W1DG3T0007A2B3C4D5E6F7G8 /* SubTrackerWidgetExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = SubTrackerWidgetExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		W1DG3T0011A2B3C4D5E6F7G8 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		W1DG3T0012A2B3C4D5E6F7G8 /* SubTrackerWidget.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = SubTrackerWidget.entitlements; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
 		7E3B3F5F2A9A5E5A00DCCA11 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		W1DG3T0013A2B3C4D5E6F7G8 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -72,6 +112,8 @@
 			isa = PBXGroup;
 			children = (
 				7E3B3F5F2A9A5E5A00DCCA03 /* SubTracker */,
+				W1DG3T0014A2B3C4D5E6F7G8 /* SubTrackerWidget */,
+				W1DG3T0015A2B3C4D5E6F7G8 /* Shared */,
 				7E3B3F5F2A9A5E5A00DCCA02 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -80,6 +122,7 @@
 			isa = PBXGroup;
 			children = (
 				7E3B3F5F2A9A5E5A00DCCA20 /* SubTracker.app */,
+				W1DG3T0007A2B3C4D5E6F7G8 /* SubTrackerWidgetExtension.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -122,6 +165,24 @@
 			path = "Preview Content";
 			sourceTree = "<group>";
 		};
+		W1DG3T0014A2B3C4D5E6F7G8 /* SubTrackerWidget */ = {
+			isa = PBXGroup;
+			children = (
+				W1DG3T0012A2B3C4D5E6F7G8 /* SubTrackerWidget.entitlements */,
+				W1DG3T0004A2B3C4D5E6F7G8 /* SubTrackerWidget.swift */,
+				W1DG3T0011A2B3C4D5E6F7G8 /* Info.plist */,
+			);
+			path = SubTrackerWidget;
+			sourceTree = "<group>";
+		};
+		W1DG3T0015A2B3C4D5E6F7G8 /* Shared */ = {
+			isa = PBXGroup;
+			children = (
+				W1DG3T0002A2B3C4D5E6F7G8 /* WidgetDataManager.swift */,
+			);
+			path = Shared;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -132,15 +193,34 @@
 				7E3B3F5F2A9A5E5A00DCCA10 /* Sources */,
 				7E3B3F5F2A9A5E5A00DCCA11 /* Frameworks */,
 				7E3B3F5F2A9A5E5A00DCCA12 /* Resources */,
+				W1DG3T0010A2B3C4D5E6F7G8 /* Embed Foundation Extensions */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				W1DG3T0016A2B3C4D5E6F7G8 /* PBXTargetDependency */,
 			);
 			name = SubTracker;
 			productName = SubTracker;
 			productReference = 7E3B3F5F2A9A5E5A00DCCA20 /* SubTracker.app */;
 			productType = "com.apple.product-type.application";
+		};
+		W1DG3T0009A2B3C4D5E6F7G8 /* SubTrackerWidgetExtension */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = W1DG3T0017A2B3C4D5E6F7G8 /* Build configuration list for PBXNativeTarget "SubTrackerWidgetExtension" */;
+			buildPhases = (
+				W1DG3T0018A2B3C4D5E6F7G8 /* Sources */,
+				W1DG3T0013A2B3C4D5E6F7G8 /* Frameworks */,
+				W1DG3T0019A2B3C4D5E6F7G8 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = SubTrackerWidgetExtension;
+			productName = SubTrackerWidgetExtension;
+			productReference = W1DG3T0007A2B3C4D5E6F7G8 /* SubTrackerWidgetExtension.appex */;
+			productType = "com.apple.product-type.app-extension";
 		};
 /* End PBXNativeTarget section */
 
@@ -153,6 +233,9 @@
 				LastUpgradeCheck = 1500;
 				TargetAttributes = {
 					7E3B3F5F2A9A5E5A00DCCA13 = {
+						ProvisioningStyle = Automatic;
+					};
+					W1DG3T0009A2B3C4D5E6F7G8 = {
 						ProvisioningStyle = Automatic;
 					};
 				};
@@ -171,6 +254,7 @@
 			projectRoot = "";
 			targets = (
 				7E3B3F5F2A9A5E5A00DCCA13 /* SubTracker */,
+				W1DG3T0009A2B3C4D5E6F7G8 /* SubTrackerWidgetExtension */,
 			);
 		};
 /* End PBXProject section */
@@ -183,6 +267,13 @@
 				7E3B3F5F2A9A5E5A00DCCAB3 /* Assets.xcassets in Resources */,
 				7E3B3F5F2A9A5E5A00DCCAB4 /* Preview Assets.xcassets in Resources */,
 				BEF6A6AD2CFECC0B0030A1C1 /* SubTracker.xcdatamodeld in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		W1DG3T0019A2B3C4D5E6F7G8 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -211,10 +302,28 @@
 				1E007FC92529F48C5983C589 /* YearlyBreakdownView.swift in Sources */,
 				BEF6A6AB2CFECC0B0030A1C1 /* SubscriptionEntity+CoreDataClass.swift in Sources */,
 				BEF6A6AC2CFECC0B0030A1C1 /* SubscriptionEntity+CoreDataProperties.swift in Sources */,
+				W1DG3T0001A2B3C4D5E6F7G8 /* WidgetDataManager.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		W1DG3T0018A2B3C4D5E6F7G8 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				W1DG3T0003A2B3C4D5E6F7G8 /* SubTrackerWidget.swift in Sources */,
+				W1DG3T0005A2B3C4D5E6F7G8 /* WidgetDataManager.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		W1DG3T0016A2B3C4D5E6F7G8 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = W1DG3T0009A2B3C4D5E6F7G8 /* SubTrackerWidgetExtension */;
+			targetProxy = W1DG3T0008A2B3C4D5E6F7G8 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		7E3B3F5F2A9A5E5A00DCCA14 /* Debug */ = {
@@ -373,6 +482,64 @@
 			};
 			name = Release;
 		};
+		W1DG3T0020A2B3C4D5E6F7G8 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CODE_SIGN_ENTITLEMENTS = SubTrackerWidget/SubTrackerWidget.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = FJKCQ5MNZ8;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = SubTrackerWidget/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "SubTracker Widget";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.enesse.SubTracker.SubTrackerWidget;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		W1DG3T0021A2B3C4D5E6F7G8 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CODE_SIGN_ENTITLEMENTS = SubTrackerWidget/SubTrackerWidget.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = FJKCQ5MNZ8;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = SubTrackerWidget/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "SubTracker Widget";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.enesse.SubTracker.SubTrackerWidget;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -390,6 +557,15 @@
 			buildConfigurations = (
 				7E3B3F5F2A9A5E5A00DCCA17 /* Debug */,
 				7E3B3F5F2A9A5E5A00DCCA18 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		W1DG3T0017A2B3C4D5E6F7G8 /* Build configuration list for PBXNativeTarget "SubTrackerWidgetExtension" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				W1DG3T0020A2B3C4D5E6F7G8 /* Debug */,
+				W1DG3T0021A2B3C4D5E6F7G8 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

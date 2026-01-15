@@ -1,5 +1,6 @@
 import Foundation
 import CoreData
+import WidgetKit
 
 actor SubscriptionStore {
     static let shared = SubscriptionStore()
@@ -40,9 +41,10 @@ actor SubscriptionStore {
             results = migrateLegacyIfNeeded()
         }
         
-        // İlk yüklemede Spotlight'ı güncelle
+        // İlk yüklemede Spotlight ve Widget'ı güncelle
         Task {
             await SpotlightManager.shared.indexAll(subscriptions: results)
+            updateWidget(with: results)
         }
         
         return results
@@ -78,8 +80,9 @@ actor SubscriptionStore {
             try? context.save()
         }
         
-        // Core Data kaydından sonra Spotlight'ı güncelle
+        // Core Data kaydından sonra Spotlight ve Widget'ı güncelle
         await SpotlightManager.shared.indexAll(subscriptions: subscriptions)
+        updateWidget(with: subscriptions)
     }
 
     private func migrateLegacyIfNeeded() -> [Subscription] {
@@ -87,5 +90,28 @@ actor SubscriptionStore {
               let decoded = try? JSONDecoder().decode([Subscription].self, from: data) else { return [] }
         Task { await save(decoded) }
         return decoded
+    }
+    
+    /// Widget verilerini günceller ve timeline'ı yeniler
+    private nonisolated func updateWidget(with subscriptions: [Subscription]) {
+        // Subscription'ları WidgetSubscription'a dönüştür
+        let widgetSubscriptions = subscriptions.map { sub in
+            WidgetSubscription(
+                id: sub.id,
+                name: sub.name,
+                amount: sub.amount,
+                currency: sub.currency,
+                nextRenewal: sub.nextRenewal,
+                cycleMonths: sub.cycle == .monthly ? 1 : 12,
+                categoryRaw: sub.category.rawValue,
+                isActive: sub.isActive
+            )
+        }
+        
+        // Widget verilerini kaydet
+        WidgetDataManager.shared.saveForWidget(subscriptions: widgetSubscriptions)
+        
+        // Widget timeline'ını yenile
+        WidgetCenter.shared.reloadTimelines(ofKind: "SubTrackerWidget")
     }
 }
