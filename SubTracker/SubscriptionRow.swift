@@ -25,7 +25,7 @@ struct SubscriptionRow: View {
             VStack(alignment: .trailing, spacing: 4) {
                 Text(subscription.formattedAmount)
                     .font(.headline)
-                Text(subscription.nextRenewal.formatted(Date.FormatStyle(date: .abbreviated, time: .omitted, locale: Locale(identifier: "tr_TR"))))
+                Text(subscription.upcomingRenewalDate.formatted(Date.FormatStyle(date: .abbreviated, time: .omitted, locale: Locale(identifier: "tr_TR"))))
                     .font(.footnote)
                     .foregroundStyle(.secondary)
             }

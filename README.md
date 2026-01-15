@@ -14,28 +14,45 @@ SwiftUI tabanli, abonelik ve düzenli harcama takibi uygulamasi. Kullanici tum a
 - Kimlik: Kullanici uygulamaya ilk giriste Apple ile oturum acar; daha once girisse dogrudan ozet acilir.
 
 ## Yol Haritasi ve Yapilacaklar
+
+### Tamamlanan Ozellikler ✅
 - [x] Abonelik zaman cizelgesi: her abonelik icin iptal/bitis tarihi destegi, gercek yenileme tarihleriyle 12 aylik nakit akisi grafigi.
 - [x] Bildirim akisi: yenileme oncesi bildirim planlama/iptal etme, hatirlatici gun ayari.
-- [x] Liste gelistirmeleri: kategori/yenileme filtresi, siralama (en yakin, en pahali), arama vurgusu.
+- [x] Liste gelistirmeleri: kategori/yenileme filtresi, siralama (en yakin, en pahali), arama.
 - [x] Analitik kartlar: en pahali 5 abonelik, son 30/90 gun trendi, iptal edilenlerden kazanilan tasarruf.
-- [x] Veri katmani: Core Data + opsiyonel iCloud senkron; JSON yerine kalici store gocmesi.
-- [ ] Guvenlik ve gizlilik: Face ID/Touch ID ile kilit, opsiyonel parola.
-- [ ] Paylasim ve disari aktarma: CSV/Paylas butonu, coklu profil veya aile paylasimi icin hazirlik.
-- [ ] UI/UX: kartlarda yenileme etiketi, detayda gecmis odemeler bolumu, iptal butonu; tema/secim tutarliligi.
-- [ ] Testler: model ve hesaplama birim testleri, bildirim planlama testi, CRUD akisi icin UI testi.
+- [x] Veri katmani: Core Data ile kalici depolama, JSON'dan goc tamamlandi.
+- [x] Tema destegi: karanlik/aydinlik tema, sistem tercihine uyum.
+- [x] Abonelik onerileri: populer servislerin otomatik tanima ve kategori atama.
+
+### Kisa Vadeli Hedefler (v1.1)
+- [ ] Widget destegi: ana ekranda toplam aylik gider ve yakin yenilemeler.
+- [x] Spotlight entegrasyonu: abonelikleri sistem aramasindan bulma.
+- [ ] Gecmis odemeler bolumu: detay sayfasinda odeme gecmisi listesi.
+- [ ] CSV disari aktarma: abonelik listesini dosya olarak paylasma.
+
+### Orta Vadeli Hedefler (v1.2)
+- [ ] Butce limiti: aylik harcama limiti belirleme ve asim uyarisi.
+- [ ] Doviz kuru donusturme: farkli para birimlerini tek para birimine cevirme.
+- [ ] iCloud senkronu: cihazlar arasi veri paylasimi.
+- [ ] Guvenlik: Face ID/Touch ID ile uygulama kilidi.
+
+### Uzun Vadeli Hedefler (v2.0 - Pro)
 - [ ] Gelir modeli (abonelik sistemi):
-  - Ucretsiz katman: temel abonelik ekleme/listeme, ozet ve bildirimler.
+  - Ucretsiz katman: temel abonelik ekleme/listeleme, ozet ve bildirimler.
   - Pro aylik/yillik:
-    - iCloud senkronu ve coklu profil.
-    - Ileri raporlama/metric kartlari: son 30/90 gun detayi, kategori bazli dagilim, iptal sonrasi kazanilan tasarruf trendi, birikimli nakit akisi.
-    - App Store aboneliklerini iceri aktarma: kullanicinin mevcut App Store aboneliklerini cekip listeye oneri olarak ekle (StoreKit makbuz analizi, izinli durumlarda).
-    - Premium temalar/ikonlar ve genis bildirim ufku.
-    - Destek/priority kanal.
-  - Deneme: 7 gun ucretsiz Pro denemesi, iptal olursa otomatik olarak ucretsiz katmana don.
-- [ ] Guvenlik ve gizlilik: Face ID/Touch ID ile kilit, opsiyonel parola.
-- [ ] Paylasim ve disari aktarma: CSV/Paylas butonu, coklu profil veya aile paylasimi icin hazirlik.
-- [ ] UI/UX: kartlarda yenileme etiketi, detayda gecmis odemeler bolumu, iptal butonu; tema/secim tutarliligi.
-- [ ] Testler: model ve hesaplama birim testleri, bildirim planlama testi, CRUD akisi icin UI testi.
+    - iCloud senkronu.
+    - Ileri raporlama: kategori bazli dagilim grafikleri, birikimli nakit akisi analizi.
+    - Premium temalar ve ozel ikonlar.
+    - Genis bildirim ufku (30 gune kadar).
+  - Deneme: 7 gun ucretsiz Pro denemesi.
+- [ ] Apple Watch uygulamasi: bilekte hizli ozet ve yakin yenilemeler.
+- [ ] Siri kisayollari: sesli komutlarla abonelik ekleme/sorgulama.
+- [ ] Aile paylasimi: ortak abonelikleri aile uyeleriyle takip etme.
+
+### Kalite ve Test
+- [ ] Birim testleri: model ve hesaplama fonksiyonlari icin.
+- [ ] UI testleri: temel CRUD akislari icin otomasyon.
+- [ ] Bildirim testleri: zamanlama ve iptal senaryolari.
 
 ## Mimarinin Cizgileri
 - Sunum: SwiftUI + ViewModel (ObservableObject) kombinasyonu, yalın state.

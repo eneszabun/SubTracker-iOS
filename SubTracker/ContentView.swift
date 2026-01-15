@@ -1,4 +1,5 @@
 import SwiftUI
+import CoreSpotlight
 
 enum AppTab: Hashable {
     case summary
@@ -12,6 +13,9 @@ struct ContentView: View {
     @State private var selectedTab: AppTab = .summary
     @AppStorage("colorSchemePreference") private var colorSchemePreference: String = "system"
     @AppStorage("reminderDays") private var reminderDays: Int = 3
+    
+    /// Spotlight'tan seçilen abonelik ID'si
+    @State private var spotlightSelectedID: UUID?
 
     init(initialSubscriptions: [Subscription] = []) {
         let stored = SubscriptionStore.shared.load()
@@ -28,7 +32,10 @@ struct ContentView: View {
                         }
                         .tag(AppTab.summary)
 
-                    SubscriptionListView(subscriptions: $subscriptions)
+                    SubscriptionListView(
+                        subscriptions: $subscriptions,
+                        spotlightSelectedID: $spotlightSelectedID
+                    )
                         .tabItem {
                             Label("Abonelikler", systemImage: "creditcard.fill")
                         }
@@ -55,6 +62,10 @@ struct ContentView: View {
             }
         }
         .preferredColorScheme(preferredScheme)
+        // Spotlight aramasından abonelik seçildiğinde
+        .onContinueUserActivity(CSSearchableItemActionType) { userActivity in
+            handleSpotlightActivity(userActivity)
+        }
     }
 
     private var preferredScheme: ColorScheme? {
@@ -63,6 +74,17 @@ struct ContentView: View {
         case "dark": return .dark
         default: return nil
         }
+    }
+    
+    /// Spotlight'tan gelen aktiviteyi işler
+    private func handleSpotlightActivity(_ userActivity: NSUserActivity) {
+        guard let subscriptionID = SpotlightManager.subscriptionID(from: userActivity) else {
+            return
+        }
+        
+        // Abonelikler sekmesine geç ve seçili aboneliği ayarla
+        selectedTab = .subscriptions
+        spotlightSelectedID = subscriptionID
     }
 }
 

@@ -573,7 +573,8 @@ struct SummaryView: View {
 
         for subscription in subscriptions {
             let stepMonths = subscription.cycle == .monthly ? 1 : 12
-            var next = subscription.nextRenewal
+            // upcomingRenewalDate zaten güncel bir sonraki tarihi hesaplıyor
+            var next = subscription.upcomingRenewalDate
 
             // ileriye sar: ilk tarih görünür aralıktan küçükse, ileri taşı
             while next < startOfMonth {
@@ -615,7 +616,7 @@ struct SummaryView: View {
     private var next30Total: Double {
         let horizon = Calendar.current.date(byAdding: .day, value: 30, to: Date()) ?? Date()
         return subscriptions.reduce(0) { acc, sub in
-            guard sub.isActive, sub.nextRenewal <= horizon else { return acc }
+            guard sub.isActive, sub.upcomingRenewalDate <= horizon else { return acc }
             return acc + sub.amountForCycle
         }
     }
@@ -623,7 +624,7 @@ struct SummaryView: View {
     private var next90Total: Double {
         let horizon = Calendar.current.date(byAdding: .day, value: 90, to: Date()) ?? Date()
         return subscriptions.reduce(0) { acc, sub in
-            guard sub.isActive, sub.nextRenewal <= horizon else { return acc }
+            guard sub.isActive, sub.upcomingRenewalDate <= horizon else { return acc }
             return acc + sub.amountForCycle
         }
     }
@@ -700,7 +701,7 @@ struct SummaryView: View {
     }
 
     private func dueBadge(for subscription: Subscription) -> SummaryUpcomingCard.Badge {
-        let days = Calendar.current.dateComponents([.day], from: Date(), to: subscription.nextRenewal).day ?? 0
+        let days = Calendar.current.dateComponents([.day], from: Date(), to: subscription.upcomingRenewalDate).day ?? 0
         if days <= 0 {
             return .init(text: "Bugün", textColor: SummaryLightPalette.negative, background: SummaryLightPalette.negative.opacity(0.12))
         } else if days == 1 {
@@ -715,7 +716,7 @@ struct SummaryView: View {
     }
 
     private func dueBadgeDark(for subscription: Subscription) -> SummaryDarkUpcomingCard.Badge {
-        let days = Calendar.current.dateComponents([.day], from: Date(), to: subscription.nextRenewal).day ?? 0
+        let days = Calendar.current.dateComponents([.day], from: Date(), to: subscription.upcomingRenewalDate).day ?? 0
         if days <= 0 {
             return .init(text: "Bugün", textColor: SummaryDarkPalette.negative, background: SummaryDarkPalette.negative.opacity(0.2))
         } else if days == 1 {

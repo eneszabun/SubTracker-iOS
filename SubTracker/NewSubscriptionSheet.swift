@@ -441,7 +441,7 @@ struct NewSubscriptionSheet: View {
     }
 
     private var nextPaymentText: String {
-        draft.nextRenewal.formatted(Date.FormatStyle(date: .abbreviated, time: .omitted))
+        draft.nextRenewal.formatted(Date.FormatStyle(date: .abbreviated, time: .omitted, locale: Locale(identifier: "tr_TR")))
     }
 
     private var currencySymbol: String {

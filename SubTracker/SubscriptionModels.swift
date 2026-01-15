@@ -45,6 +45,7 @@ struct Subscription: Identifiable, Codable, Equatable {
     var name: String
     var amount: Double
     var currency: String
+    /// Aboneliğin başlangıç/referans tarihi (ilk ödeme tarihi)
     var nextRenewal: Date
     var endDate: Date?
     var cycle: BillingCycle
@@ -73,6 +74,43 @@ struct Subscription: Identifiable, Codable, Equatable {
         formatter.currencyCode = currency
         return formatter.string(from: amount as NSNumber) ?? "\(amount) \(currency)"
     }
+    
+    /// Bir sonraki yenileme tarihini hesaplar.
+    /// Eğer `nextRenewal` geçmişteyse, döngüye göre (aylık/yıllık) bugüne veya geleceğe kadar ilerletir.
+    var upcomingRenewalDate: Date {
+        let calendar = Calendar.current
+        let now = Date()
+        let today = calendar.startOfDay(for: now)
+        
+        // Başlangıç tarihi zaten gelecekteyse, olduğu gibi döndür
+        if calendar.startOfDay(for: nextRenewal) >= today {
+            return nextRenewal
+        }
+        
+        // Bitiş tarihi varsa ve geçmişteyse, son yenileme tarihini döndür
+        if let end = endDate, end < now {
+            return nextRenewal
+        }
+        
+        // Döngüye göre adım sayısı (ay cinsinden)
+        let stepMonths = cycle == .monthly ? 1 : 12
+        
+        // Geçmişten bugüne kadar ilerlet
+        var renewalDate = nextRenewal
+        while calendar.startOfDay(for: renewalDate) < today {
+            // Bitiş tarihi kontrolü
+            if let end = endDate, renewalDate > end {
+                break
+            }
+            
+            guard let advanced = calendar.date(byAdding: .month, value: stepMonths, to: renewalDate) else {
+                break
+            }
+            renewalDate = advanced
+        }
+        
+        return renewalDate
+    }
 }
 
 extension Array where Element == Subscription {
@@ -80,10 +118,12 @@ extension Array where Element == Subscription {
 
     var yearlyTotal: Double { reduce(0) { $0 + ($1.isActive ? ($1.monthlyCost * 12) : 0) } }
 
+    /// Önümüzdeki 14 gün içinde yenilenecek abonelikler
     var upcoming: [Subscription] {
         let now = Date()
         let horizon = Calendar.current.date(byAdding: .day, value: 14, to: now) ?? now
-        return filter { $0.isActive && $0.nextRenewal <= horizon }.sorted { $0.nextRenewal < $1.nextRenewal }
+        return filter { $0.isActive && $0.upcomingRenewalDate <= horizon }
+            .sorted { $0.upcomingRenewalDate < $1.upcomingRenewalDate }
     }
 }
 

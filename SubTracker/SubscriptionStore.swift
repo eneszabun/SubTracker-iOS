@@ -39,6 +39,12 @@ actor SubscriptionStore {
         if results.isEmpty {
             results = migrateLegacyIfNeeded()
         }
+        
+        // İlk yüklemede Spotlight'ı güncelle
+        Task {
+            await SpotlightManager.shared.indexAll(subscriptions: results)
+        }
+        
         return results
     }
 
@@ -71,6 +77,9 @@ actor SubscriptionStore {
 
             try? context.save()
         }
+        
+        // Core Data kaydından sonra Spotlight'ı güncelle
+        await SpotlightManager.shared.indexAll(subscriptions: subscriptions)
     }
 
     private func migrateLegacyIfNeeded() -> [Subscription] {

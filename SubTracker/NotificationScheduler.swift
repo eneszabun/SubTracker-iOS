@@ -47,8 +47,10 @@ actor NotificationScheduler {
         let calendar = Calendar.current
         let now = Date()
 
+        let renewalDate = subscription.upcomingRenewalDate
+        
         if reminderDays > 0,
-           let reminderDate = calendar.date(byAdding: .day, value: -reminderDays, to: subscription.nextRenewal),
+           let reminderDate = calendar.date(byAdding: .day, value: -reminderDays, to: renewalDate),
            reminderDate > now {
             var content = UNMutableNotificationContent()
             content.title = contentBase.title
@@ -59,12 +61,12 @@ actor NotificationScheduler {
             try? await center.add(request)
         }
 
-        if subscription.nextRenewal > now {
+        if renewalDate > now {
             var content = UNMutableNotificationContent()
             content.title = contentBase.title
             content.body = "Bugün yenileniyor. Tutar: \(amountText)"
             content.sound = .default
-            let trigger = UNCalendarNotificationTrigger(dateMatching: calendar.dateComponents([.year, .month, .day, .hour, .minute], from: subscription.nextRenewal), repeats: false)
+            let trigger = UNCalendarNotificationTrigger(dateMatching: calendar.dateComponents([.year, .month, .day, .hour, .minute], from: renewalDate), repeats: false)
             let request = UNNotificationRequest(identifier: identifiers.renewal, content: content, trigger: trigger)
             try? await center.add(request)
         }

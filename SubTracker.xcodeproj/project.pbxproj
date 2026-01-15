@@ -27,6 +27,7 @@
 		BEF6A6AB2CFECC0B0030A1C1 /* SubscriptionEntity+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEF6A6A82CFECC0B0030A1C1 /* SubscriptionEntity+CoreDataClass.swift */; };
 		BEF6A6AC2CFECC0B0030A1C1 /* SubscriptionEntity+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEF6A6A92CFECC0B0030A1C1 /* SubscriptionEntity+CoreDataProperties.swift */; };
 		BEF6A6AD2CFECC0B0030A1C1 /* SubTracker.xcdatamodeld in Resources */ = {isa = PBXBuildFile; fileRef = BEF6A6AA2CFECC0B0030A1C1 /* SubTracker.xcdatamodeld */; };
+		SP0T1IGHT2D2F3G4H5I6J7K8 /* SpotlightManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = SP0T1IGHT1A2B3C4D5E6F7G8H /* SpotlightManager.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -53,6 +54,7 @@
 		BEF6A6A82CFECC0B0030A1C1 /* SubscriptionEntity+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SubscriptionEntity+CoreDataClass.swift"; sourceTree = "<group>"; };
 		BEF6A6A92CFECC0B0030A1C1 /* SubscriptionEntity+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SubscriptionEntity+CoreDataProperties.swift"; sourceTree = "<group>"; };
 		BEF6A6AA2CFECC0B0030A1C1 /* SubTracker.xcdatamodeld */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodeld; path = SubTracker.xcdatamodeld; sourceTree = "<group>"; };
+		SP0T1IGHT1A2B3C4D5E6F7G8H /* SpotlightManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpotlightManager.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -94,6 +96,7 @@
 				C227FD3BABBE7F79E9FFD0F4 /* SubscriptionRow.swift */,
 				445B53E1F22002DFB94473CA /* NotificationScheduler.swift */,
 				77B62ABA3B291540C9453C76 /* SubscriptionStore.swift */,
+				SP0T1IGHT1A2B3C4D5E6F7G8H /* SpotlightManager.swift */,
 				4181CB8A354F904BC467D056 /* SummaryView.swift */,
 				96D84AA213FA9D28A176E5F8 /* SubscriptionListView.swift */,
 				0D4AB35EC155CE3FD1BD8880 /* SubscriptionDetailView.swift */,
@@ -198,6 +201,7 @@
 				187A100ECBB5DA4289FFE99A /* SubscriptionRow.swift in Sources */,
 				307452C6351FBC1FE98F5E65 /* NotificationScheduler.swift in Sources */,
 				D65F1A031213ABB54BF1F7EF /* SubscriptionStore.swift in Sources */,
+				SP0T1IGHT2D2F3G4H5I6J7K8 /* SpotlightManager.swift in Sources */,
 				AF721B637A16253777EC787C /* SummaryView.swift in Sources */,
 				47D4552F00FCC53CBB77BDA0 /* SubscriptionListView.swift in Sources */,
 				79BCAA1C690612504BED2B9E /* SubscriptionDetailView.swift in Sources */,

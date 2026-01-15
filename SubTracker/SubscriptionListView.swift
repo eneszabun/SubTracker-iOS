@@ -2,6 +2,8 @@ import SwiftUI
 
 struct SubscriptionListView: View {
     @Binding var subscriptions: [Subscription]
+    /// Spotlight'tan seçilen abonelik ID'si
+    @Binding var spotlightSelectedID: UUID?
     @State private var searchText = ""
     @State private var isPresentingAdd = false
     @State private var editingSubscriptionID: UUID?
@@ -11,9 +13,17 @@ struct SubscriptionListView: View {
     @State private var sortOption: SortOption = .nearestRenewal
     @State private var selectedChip: SubscriptionChip = .all
     @Environment(\.colorScheme) private var colorScheme
+    
+    /// Spotlight'tan açılan abonelik detayı için navigation path
+    @State private var spotlightNavigationID: UUID?
 
     private var palette: SubscriptionListPalette {
         SubscriptionListPalette(scheme: colorScheme)
+    }
+    
+    init(subscriptions: Binding<[Subscription]>, spotlightSelectedID: Binding<UUID?> = .constant(nil)) {
+        _subscriptions = subscriptions
+        _spotlightSelectedID = spotlightSelectedID
     }
 
     var filtered: [Subscription] {
@@ -44,7 +54,7 @@ struct SubscriptionListView: View {
 
         switch sortOption {
         case .nearestRenewal:
-            result = result.sorted { $0.nextRenewal < $1.nextRenewal }
+            result = result.sorted { $0.upcomingRenewalDate < $1.upcomingRenewalDate }
         case .highestCost:
             result = result.sorted { $0.monthlyCost > $1.monthlyCost }
         }
@@ -72,6 +82,20 @@ struct SubscriptionListView: View {
             .overlay(alignment: .bottomTrailing) {
                 addButton
             }
+            .navigationDestination(item: $spotlightNavigationID) { id in
+                if let binding = binding(for: id) {
+                    SubscriptionDetailView(subscription: binding, onSave: { updated in
+                        Task {
+                            await NotificationScheduler.shared.reschedule(subscription: updated, reminderDays: reminderDays)
+                        }
+                    }) {
+                        delete(id)
+                        spotlightNavigationID = nil
+                    }
+                } else {
+                    Text("Abonelik bulunamadı")
+                }
+            }
         }
         .sheet(isPresented: $isPresentingAdd) {
             NewSubscriptionSheet(defaultCurrency: defaultCurrency) { newSubscription in
@@ -94,6 +118,16 @@ struct SubscriptionListView: View {
                     }
                 }
             }
+        }
+        // Spotlight'tan gelen seçimi işle
+        .onChange(of: spotlightSelectedID) { _, newID in
+            guard let id = newID else { return }
+            // Eğer abonelik mevcutsa detay sayfasını aç
+            if subscriptions.contains(where: { $0.id == id }) {
+                spotlightNavigationID = id
+            }
+            // ID'yi temizle (tekrar kullanılabilir olması için)
+            spotlightSelectedID = nil
         }
     }
 
@@ -335,7 +369,8 @@ struct SubscriptionListView: View {
 
         for subscription in subscriptions {
             let stepMonths = subscription.cycle == .monthly ? 1 : 12
-            var next = subscription.nextRenewal
+            // upcomingRenewalDate zaten güncel bir sonraki tarihi hesaplıyor
+            var next = subscription.upcomingRenewalDate
 
             while next < startOfMonth {
                 guard let advanced = calendar.date(byAdding: .month, value: stepMonths, to: next) else { break }
@@ -370,7 +405,7 @@ struct SubscriptionListView: View {
     }
 
     private func nextRenewalText(for subscription: Subscription) -> String {
-        subscription.nextRenewal.formatted(Date.FormatStyle(date: .abbreviated, time: .omitted))
+        subscription.upcomingRenewalDate.formatted(Date.FormatStyle(date: .abbreviated, time: .omitted, locale: Locale(identifier: "tr_TR")))
     }
 
     private func formattedAmount(_ value: Double) -> String {

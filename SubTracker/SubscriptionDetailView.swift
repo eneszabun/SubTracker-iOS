@@ -137,17 +137,12 @@ struct SubscriptionDetailView: View {
 
             HStack(spacing: 12) {
                 fieldBlock(title: "Tutar") {
-                    HStack(spacing: 8) {
-                        Image(systemName: "dollarsign")
-                            .font(.system(size: 16, weight: .semibold))
-                            .foregroundStyle(palette.textSecondary)
-                        TextField("0,00", text: $amount)
-                            .keyboardType(.numbersAndPunctuation)
-                            .foregroundStyle(palette.textPrimary)
-                            .onChange(of: amount, initial: false) { _, newValue in
-                                amount = sanitizeAmountInput(newValue)
-                            }
-                    }
+                    TextField("0,00", text: $amount)
+                        .keyboardType(.numbersAndPunctuation)
+                        .foregroundStyle(palette.textPrimary)
+                        .onChange(of: amount, initial: false) { _, newValue in
+                            amount = sanitizeAmountInput(newValue)
+                        }
                 }
 
                 fieldBlock(title: "Para Birimi") {
