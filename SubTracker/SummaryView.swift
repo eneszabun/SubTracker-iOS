@@ -8,6 +8,20 @@ struct SummaryView: View {
     @Environment(\.colorScheme) private var colorScheme
     @State private var selectedPeriod: SummaryPeriod = .yearly
     @State private var isPresentingAdd = false
+    
+    /// Subscription ID'sine göre binding döndürür
+    private func binding(for id: UUID) -> Binding<Subscription>? {
+        guard let index = subscriptions.firstIndex(where: { $0.id == id }) else { return nil }
+        return $subscriptions[index]
+    }
+    
+    /// Abonelik silme
+    private func delete(_ id: UUID) {
+        if let index = subscriptions.firstIndex(where: { $0.id == id }) {
+            subscriptions.remove(at: index)
+            Task { await NotificationScheduler.shared.cancel(for: id) }
+        }
+    }
 
     var body: some View {
         NavigationStack {
@@ -358,10 +372,23 @@ struct SummaryView: View {
                 ScrollView(.horizontal, showsIndicators: false) {
                     LazyHStack(spacing: 12) {
                         ForEach(subscriptions.upcoming) { subscription in
-                            SummaryUpcomingCard(
-                                subscription: subscription,
-                                badge: dueBadge(for: subscription)
-                            )
+                            if let subBinding = binding(for: subscription.id) {
+                                NavigationLink {
+                                    SubscriptionDetailView(subscription: subBinding, onSave: { updated in
+                                        Task {
+                                            await NotificationScheduler.shared.reschedule(subscription: updated, reminderDays: reminderDays)
+                                        }
+                                    }) {
+                                        delete(subscription.id)
+                                    }
+                                } label: {
+                                    SummaryUpcomingCard(
+                                        subscription: subscription,
+                                        badge: dueBadge(for: subscription)
+                                    )
+                                }
+                                .buttonStyle(.plain)
+                            }
                         }
                     }
                     .padding(.bottom, 6)
@@ -399,10 +426,23 @@ struct SummaryView: View {
                 ScrollView(.horizontal, showsIndicators: false) {
                     LazyHStack(spacing: 12) {
                         ForEach(subscriptions.upcoming) { subscription in
-                            SummaryDarkUpcomingCard(
-                                subscription: subscription,
-                                badge: dueBadgeDark(for: subscription)
-                            )
+                            if let subBinding = binding(for: subscription.id) {
+                                NavigationLink {
+                                    SubscriptionDetailView(subscription: subBinding, onSave: { updated in
+                                        Task {
+                                            await NotificationScheduler.shared.reschedule(subscription: updated, reminderDays: reminderDays)
+                                        }
+                                    }) {
+                                        delete(subscription.id)
+                                    }
+                                } label: {
+                                    SummaryDarkUpcomingCard(
+                                        subscription: subscription,
+                                        badge: dueBadgeDark(for: subscription)
+                                    )
+                                }
+                                .buttonStyle(.plain)
+                            }
                         }
                     }
                     .padding(.bottom, 6)
@@ -426,10 +466,23 @@ struct SummaryView: View {
             } else {
                 VStack(spacing: 10) {
                     ForEach(topFive) { subscription in
-                        SummaryHighestCostRow(
-                            subscription: subscription,
-                            monthlyAmount: formattedAmount(subscription.monthlyCost, currencyCode: subscription.currency)
-                        )
+                        if let subBinding = binding(for: subscription.id) {
+                            NavigationLink {
+                                SubscriptionDetailView(subscription: subBinding, onSave: { updated in
+                                    Task {
+                                        await NotificationScheduler.shared.reschedule(subscription: updated, reminderDays: reminderDays)
+                                    }
+                                }) {
+                                    delete(subscription.id)
+                                }
+                            } label: {
+                                SummaryHighestCostRow(
+                                    subscription: subscription,
+                                    monthlyAmount: formattedAmount(subscription.monthlyCost, currencyCode: subscription.currency)
+                                )
+                            }
+                            .buttonStyle(.plain)
+                        }
                     }
                 }
             }
@@ -450,10 +503,23 @@ struct SummaryView: View {
             } else {
                 VStack(spacing: 10) {
                     ForEach(topFive) { subscription in
-                        SummaryDarkHighestCostRow(
-                            subscription: subscription,
-                            monthlyAmount: formattedAmount(subscription.monthlyCost, currencyCode: subscription.currency)
-                        )
+                        if let subBinding = binding(for: subscription.id) {
+                            NavigationLink {
+                                SubscriptionDetailView(subscription: subBinding, onSave: { updated in
+                                    Task {
+                                        await NotificationScheduler.shared.reschedule(subscription: updated, reminderDays: reminderDays)
+                                    }
+                                }) {
+                                    delete(subscription.id)
+                                }
+                            } label: {
+                                SummaryDarkHighestCostRow(
+                                    subscription: subscription,
+                                    monthlyAmount: formattedAmount(subscription.monthlyCost, currencyCode: subscription.currency)
+                                )
+                            }
+                            .buttonStyle(.plain)
+                        }
                     }
                 }
             }
