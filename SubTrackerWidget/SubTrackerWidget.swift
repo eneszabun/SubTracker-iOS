@@ -70,10 +70,33 @@ struct SubTrackerWidgetEntryView: View {
         switch family {
         case .systemSmall:
             SmallWidgetView(entry: entry)
+                .containerBackground(for: .widget) {
+                    LinearGradient(
+                        colors: [
+                            Color(red: 0.11, green: 0.45, blue: 0.93),
+                            Color(red: 0.08, green: 0.35, blue: 0.78)
+                        ],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    )
+                }
         case .systemMedium:
             MediumWidgetView(entry: entry)
+                .containerBackground(for: .widget) {
+                    Color.clear
+                }
         default:
             SmallWidgetView(entry: entry)
+                .containerBackground(for: .widget) {
+                    LinearGradient(
+                        colors: [
+                            Color(red: 0.11, green: 0.45, blue: 0.93),
+                            Color(red: 0.08, green: 0.35, blue: 0.78)
+                        ],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    )
+                }
         }
     }
 }
@@ -117,17 +140,6 @@ struct SmallWidgetView: View {
             .foregroundStyle(.white.opacity(0.7))
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
-        .padding(16)
-        .background(
-            LinearGradient(
-                colors: [
-                    Color(red: 0.11, green: 0.45, blue: 0.93),
-                    Color(red: 0.08, green: 0.35, blue: 0.78)
-                ],
-                startPoint: .topLeading,
-                endPoint: .bottomTrailing
-            )
-        )
     }
     
     private func formattedAmount(_ value: Double) -> String {

@@ -7,6 +7,8 @@ struct SettingsView: View {
     @AppStorage("colorSchemePreference") private var colorSchemePreference: String = "system"
     @Environment(\.colorScheme) private var colorScheme
     @Environment(\.dismiss) private var dismiss
+    @State private var showingNameEditor = false
+    @State private var editingName = ""
 
     private let currencies = ["USD", "EUR", "GBP", "TRY"]
 
@@ -107,15 +109,36 @@ struct SettingsView: View {
                 }
             }
 
-            Text(auth.displayName)
-                .font(.system(size: 20, weight: .bold))
-                .foregroundStyle(palette.textPrimary)
+            Button {
+                editingName = auth.displayName
+                showingNameEditor = true
+            } label: {
+                HStack(spacing: 6) {
+                    Text(auth.displayName)
+                        .font(.system(size: 20, weight: .bold))
+                        .foregroundStyle(palette.textPrimary)
+                    Image(systemName: "pencil")
+                        .font(.system(size: 14, weight: .medium))
+                        .foregroundStyle(palette.textSecondary)
+                }
+            }
+            .buttonStyle(.plain)
 
             Text("Pro Hesap")
                 .font(.system(size: 14, weight: .medium))
                 .foregroundStyle(palette.textSecondary)
         }
         .frame(maxWidth: .infinity)
+        .sheet(isPresented: $showingNameEditor) {
+            NameEditorSheet(
+                name: $editingName,
+                palette: palette,
+                onSave: {
+                    auth.updateDisplayName(editingName)
+                }
+            )
+            .presentationDetents([.height(220)])
+        }
     }
 
     private var appearanceSection: some View {
@@ -539,4 +562,61 @@ private struct SettingsPalette {
 
     var destructive: Color { scheme == .dark ? Color(red: 0.95, green: 0.4, blue: 0.4) : Color(red: 0.86, green: 0.2, blue: 0.2) }
     var destructiveBorder: Color { scheme == .dark ? Color(red: 0.55, green: 0.18, blue: 0.18).opacity(0.4) : Color(red: 0.95, green: 0.85, blue: 0.85) }
+}
+
+private struct NameEditorSheet: View {
+    @Binding var name: String
+    let palette: SettingsPalette
+    let onSave: () -> Void
+    
+    @Environment(\.dismiss) private var dismiss
+    @FocusState private var isFocused: Bool
+    
+    var body: some View {
+        NavigationStack {
+            VStack(spacing: 20) {
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("Adınız")
+                        .font(.system(size: 13, weight: .medium))
+                        .foregroundStyle(palette.textSecondary)
+                    
+                    TextField("Adınızı girin", text: $name)
+                        .font(.system(size: 17, weight: .medium))
+                        .foregroundStyle(palette.textPrimary)
+                        .padding(14)
+                        .background(palette.surface, in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 12, style: .continuous)
+                                .stroke(palette.cardBorder, lineWidth: 1)
+                        )
+                        .focused($isFocused)
+                }
+                
+                Spacer()
+            }
+            .padding(.horizontal, 20)
+            .padding(.top, 20)
+            .background(palette.background)
+            .navigationTitle("İsmi Düzenle")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("İptal") {
+                        dismiss()
+                    }
+                }
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("Kaydet") {
+                        onSave()
+                        dismiss()
+                    }
+                    .fontWeight(.semibold)
+                    .disabled(name.trimmingCharacters(in: .whitespaces).isEmpty)
+                }
+            }
+            .onAppear {
+                isFocused = true
+            }
+        }
+    }
 }
