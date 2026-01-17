@@ -134,8 +134,8 @@ open APP_STORE_CHECKLIST.md
 
 1. **IAP oluşturun:**
    - App Store Connect → IAP → Subscription Group
-   - Monthly: `com.subtracker.pro.monthly` (₺39.99)
-   - Yearly: `com.subtracker.pro.yearly` (₺299.99)
+   - Monthly: `com.subtracker.pro.monthly` ($2.99)
+   - Yearly: `com.subtracker.pro.yearly` ($29.00)
    - Her ikisi için 7-day free trial
 
 2. **TestFlight (opsiyonel):**

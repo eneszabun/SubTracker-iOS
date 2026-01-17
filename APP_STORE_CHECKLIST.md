@@ -31,34 +31,34 @@ Bu checklist'i yazdırabilir veya her adımı tamamladıkça işaretleyebilirsin
 ## 2️⃣ Xcode Ayarları
 
 ### StoreKit Configuration Kaldırma
-- [ ] Xcode'u aç
-- [ ] Product → Scheme → Edit Scheme
-- [ ] Run → Options
-- [ ] StoreKit Configuration: **None** seç
-- [ ] Close
+- [X] Xcode'u aç
+- [X] Product → Scheme → Edit Scheme
+- [X] Run → Options
+- [X] StoreKit Configuration: **None** seç
+- [X] Close
 
 ### Code Signing
-- [ ] Project → SubTracker target → Signing & Capabilities
-- [ ] Automatically manage signing ✅
-- [ ] Team seç: `______________________________`
-- [ ] Widget target için tekrarla
+- [X] Project → SubTracker target → Signing & Capabilities
+- [X] Automatically manage signing ✅
+- [X] Team seç: `______________________________`
+- [X] Widget target için tekrarla
 
 ---
 
 ## 3️⃣ App Store Connect
 
 ### Uygulama Kaydı
-- [ ] https://appstoreconnect.apple.com → My Apps → (+)
-- [ ] Platform: iOS
-- [ ] Name: SubTracker (veya tercih ettiğiniz)
-- [ ] Language: Turkish
-- [ ] Bundle ID: `com.enesse.SubTracker`
-- [ ] SKU: `SUBTRACKER-IOS-001`
+- [X] https://appstoreconnect.apple.com → My Apps → (+)
+- [X] Platform: iOS
+- [X] Name: SubTracker (veya tercih ettiğiniz)
+- [X] Language: Turkish
+- [X] Bundle ID: `com.enesse.SubTracker`
+- [X] SKU: `SUBTRACKER-IOS-001`
 
 ### App Information
-- [ ] Primary Category: **Finance**
-- [ ] Secondary Category: **Productivity**
-- [ ] Privacy Policy URL: `______________________________`
+- [X] Primary Category: **Finance**
+- [X] Secondary Category: **Productivity**
+- [X] Privacy Policy URL: `______________________________`
 - [ ] Terms URL: `______________________________`
 - [ ] Support URL: `______________________________`
 
@@ -134,7 +134,7 @@ Bu checklist'i yazdırabilir veya her adımı tamamladıkça işaretleyebilirsin
 - [ ] Create Subscription
 - [ ] Product ID: `com.subtracker.pro.monthly`
 - [ ] Duration: 1 Month
-- [ ] Price: ₺39.99 (Tier 13)
+- [ ] Price: $2.99 (USD)
 - [ ] Free Trial: 7 Days
 - [ ] Turkish localization doldur
 - [ ] English localization doldur
@@ -144,7 +144,7 @@ Bu checklist'i yazdırabilir veya her adımı tamamladıkça işaretleyebilirsin
 - [ ] Create Subscription
 - [ ] Product ID: `com.subtracker.pro.yearly`
 - [ ] Duration: 1 Year
-- [ ] Price: ₺299.99 (Tier 99)
+- [ ] Price: $29.00 (USD)
 - [ ] Free Trial: 7 Days
 - [ ] Turkish localization doldur
 - [ ] English localization doldur

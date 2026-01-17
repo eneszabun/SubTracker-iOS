@@ -1,4 +1,5 @@
 import Foundation
+import UIKit
 
 /// App-wide constants and configuration
 struct AppConstants {

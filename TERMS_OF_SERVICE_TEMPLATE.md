@@ -56,8 +56,8 @@ Pro subscription includes:
 - Premium features
 
 **Pricing:**
-- Monthly: ₺39.99/month
-- Yearly: ₺299.99/year (37% savings)
+- Monthly: $2.99/month
+- Yearly: $29.00/year (19% savings)
 
 **Free Trial:**
 - 7-day free trial for new subscribers

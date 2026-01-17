@@ -11,8 +11,8 @@
     "_developerTeamID" : "YOUR_TEAM_ID",
     "_failTransactionsEnabled" : false,
     "_lastSynchronizedDate" : 759593769.96031702,
-    "_locale" : "tr_TR",
-    "_storefront" : "TUR",
+    "_locale" : "en_US",
+    "_storefront" : "USA",
     "_storeKitErrors" : [
       {
         "current" : null,
@@ -66,7 +66,7 @@
           "codeOffers" : [
 
           ],
-          "displayPrice" : "39.99",
+          "displayPrice" : "2.99",
           "familyShareable" : false,
           "groupNumber" : 1,
           "internalID" : "6738397418",
@@ -101,7 +101,7 @@
           "codeOffers" : [
 
           ],
-          "displayPrice" : "299.99",
+          "displayPrice" : "29.00",
           "familyShareable" : false,
           "groupNumber" : 2,
           "internalID" : "6738397419",
@@ -113,12 +113,12 @@
           },
           "localizations" : [
             {
-              "description" : "Tüm Pro özelliklere yıllık erişim - %37 tasarruf",
+              "description" : "Tüm Pro özelliklere yıllık erişim - %19 tasarruf",
               "displayName" : "SubTracker Pro Yıllık",
               "locale" : "tr_TR"
             },
             {
-              "description" : "Yearly access to all Pro features - Save 37%",
+              "description" : "Yearly access to all Pro features - Save 19%",
               "displayName" : "SubTracker Pro Yearly",
               "locale" : "en_US"
             }

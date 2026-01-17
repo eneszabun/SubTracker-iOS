@@ -724,7 +724,7 @@ private struct SettingsRow: View {
     let iconBackground: Color
     let iconColor: Color
     let title: String
-    let value: String
+    let value: String?
 
     var body: some View {
         HStack(spacing: 12) {
@@ -743,13 +743,15 @@ private struct SettingsRow: View {
 
             Spacer()
 
-            HStack(spacing: 6) {
-                Text(value)
-                    .font(.system(size: 14, weight: .medium))
-                    .foregroundStyle(palette.textSecondary)
-                Image(systemName: "chevron.right")
-                    .font(.system(size: 12, weight: .semibold))
-                    .foregroundStyle(palette.textSecondary.opacity(0.7))
+            if let value = value {
+                HStack(spacing: 6) {
+                    Text(value)
+                        .font(.system(size: 14, weight: .medium))
+                        .foregroundStyle(palette.textSecondary)
+                    Image(systemName: "chevron.right")
+                        .font(.system(size: 12, weight: .semibold))
+                        .foregroundStyle(palette.textSecondary.opacity(0.7))
+                }
             }
         }
         .padding(.horizontal, 16)

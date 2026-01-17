@@ -26,8 +26,8 @@ Artık uygulamayı simulator veya cihazda çalıştırdığınızda:
 
 ## 💰 Test Fiyatları
 
-- **Aylık Plan**: ₺39.99/ay
-- **Yıllık Plan**: ₺299.99/yıl (%37 tasarruf)
+- **Aylık Plan**: $2.99/ay
+- **Yıllık Plan**: $29.00/yıl (%19 tasarruf)
 - **Deneme Süresi**: İlk 7 gün ücretsiz
 
 ## 🔍 Test İpuçları

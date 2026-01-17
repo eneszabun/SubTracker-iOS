@@ -183,7 +183,7 @@ Subscription Duration: 1 Month
 
 **Pricing:**
 ```
-Price: ₺39.99 (Tier 13 veya istediğiniz fiyat)
+Price: $2.99 (USD)
 ```
 
 **Introductory Offer (7 gün ücretsiz deneme):**
@@ -215,7 +215,7 @@ Yukarıdaki adımları tekrarlayın:
 Reference Name: SubTracker Pro Yearly
 Product ID: com.subtracker.pro.yearly
 Subscription Duration: 1 Year
-Price: ₺299.99 (Tier 99 - %37 tasarruf)
+Price: $29.00 (USD - %19 tasarruf)
 Introductory Offer: 7 Days Free Trial
 ```
 
