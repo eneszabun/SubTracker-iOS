@@ -171,7 +171,15 @@ struct SubscriptionListView: View {
         let total = subscriptions.monthlyTotal
         let trendText = formattedTrendText
         let trendValue = trendPercentValue
-        let trendColor = trendValue ?? 0 >= 0 ? palette.positive : palette.negative
+        // Light modda trend renkleri beyaz üzerinde görünür olmalı
+        let trendColor: Color = {
+            if colorScheme == .dark {
+                return trendValue ?? 0 >= 0 ? palette.positive : palette.negative
+            } else {
+                // Light modda beyaz üzerine okunabilir renkler
+                return trendValue ?? 0 >= 0 ? Color(red: 0.6, green: 1.0, blue: 0.7) : Color(red: 1.0, green: 0.7, blue: 0.7)
+            }
+        }()
 
         return HStack(spacing: 12) {
             VStack(alignment: .leading, spacing: 8) {
@@ -203,9 +211,9 @@ struct SubscriptionListView: View {
 
             Image(systemName: "chart.pie.fill")
                 .font(.system(size: 20, weight: .bold))
-                .foregroundStyle(palette.primary)
+                .foregroundStyle(palette.summaryIconColor)
                 .frame(width: 48, height: 48)
-                .background(palette.primary.opacity(colorScheme == .dark ? 0.2 : 0.1), in: Circle())
+                .background(palette.summaryIconBackground, in: Circle())
         }
         .padding(16)
         .background(
@@ -547,12 +555,14 @@ private struct SubscriptionListPalette {
     var summaryGradient: [Color] {
         scheme == .dark
             ? [Color(red: 0.11, green: 0.14, blue: 0.18), Color(red: 0.07, green: 0.09, blue: 0.12)]
-            : [Color(red: 0.12, green: 0.14, blue: 0.18), Color(red: 0.18, green: 0.2, blue: 0.24)]
+            : [Color(red: 0.06, green: 0.35, blue: 0.85), Color(red: 0.15, green: 0.45, blue: 0.92)]
     }
     var summaryTextPrimary: Color { Color.white }
-    var summaryTextSecondary: Color { scheme == .dark ? textSecondary : Color.white.opacity(0.65) }
+    var summaryTextSecondary: Color { Color.white.opacity(scheme == .dark ? 0.6 : 0.85) }
     var summaryBorder: Color { scheme == .dark ? cardBorder : Color.white.opacity(0.2) }
-    var summaryShadow: Color { scheme == .dark ? Color.black.opacity(0.2) : Color.black.opacity(0.08) }
+    var summaryShadow: Color { scheme == .dark ? Color.black.opacity(0.2) : primary.opacity(0.3) }
+    var summaryIconBackground: Color { scheme == .dark ? primary.opacity(0.2) : Color.white.opacity(0.25) }
+    var summaryIconColor: Color { scheme == .dark ? primary : Color.white }
     var badgeMonthlyBackground: Color { scheme == .dark ? Color(red: 0.15, green: 0.18, blue: 0.24) : Color(red: 0.95, green: 0.95, blue: 0.96) }
     var badgeMonthlyText: Color { scheme == .dark ? Color(red: 0.7, green: 0.74, blue: 0.8) : Color(red: 0.45, green: 0.48, blue: 0.52) }
     var badgeYearlyBackground: Color { primary.opacity(scheme == .dark ? 0.2 : 0.12) }

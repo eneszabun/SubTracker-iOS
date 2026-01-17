@@ -43,6 +43,9 @@ actor NotificationScheduler {
         formatter.numberStyle = .currency
         formatter.currencyCode = subscription.currency
         let amountText = formatter.string(from: subscription.amount as NSNumber) ?? ""
+        
+        // Deep link için abonelik ID'sini userInfo'ya ekle
+        let userInfo: [String: String] = ["subscriptionId": subscription.id.uuidString]
 
         let calendar = Calendar.current
         let now = Date()
@@ -56,6 +59,7 @@ actor NotificationScheduler {
             content.title = contentBase.title
             content.body = "\(reminderDays) gün sonra yenileniyor. Tutar: \(amountText)"
             content.sound = .default
+            content.userInfo = userInfo
             let trigger = UNCalendarNotificationTrigger(dateMatching: calendar.dateComponents([.year, .month, .day, .hour, .minute], from: reminderDate), repeats: false)
             let request = UNNotificationRequest(identifier: identifiers.reminder, content: content, trigger: trigger)
             try? await center.add(request)
@@ -66,6 +70,7 @@ actor NotificationScheduler {
             content.title = contentBase.title
             content.body = "Bugün yenileniyor. Tutar: \(amountText)"
             content.sound = .default
+            content.userInfo = userInfo
             let trigger = UNCalendarNotificationTrigger(dateMatching: calendar.dateComponents([.year, .month, .day, .hour, .minute], from: renewalDate), repeats: false)
             let request = UNNotificationRequest(identifier: identifiers.renewal, content: content, trigger: trigger)
             try? await center.add(request)
@@ -80,5 +85,47 @@ actor NotificationScheduler {
     private func identifiers(for id: UUID) -> (reminder: String, renewal: String) {
         let base = id.uuidString
         return ("\(base)-reminder", "\(base)-renewal")
+    }
+    
+    // MARK: - Test Functions
+    
+    /// Test bildirimi gönderir (5 saniye sonra)
+    func sendTestNotification() async {
+        let content = UNMutableNotificationContent()
+        content.title = "SubTracker Test Bildirimi"
+        content.body = "Bildirimler düzgün çalışıyor! 🎉"
+        content.sound = .default
+        
+        // 5 saniye sonra tetikle
+        let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 5, repeats: false)
+        let request = UNNotificationRequest(identifier: "test-notification", content: content, trigger: trigger)
+        
+        try? await center.add(request)
+    }
+    
+    /// Belirli bir abonelik için hemen test bildirimi gönderir
+    func sendTestReminderNotification(for subscription: Subscription, reminderDays: Int) async {
+        let content = UNMutableNotificationContent()
+        content.title = "\(subscription.name) yenilemesi"
+        
+        let formatter = NumberFormatter()
+        formatter.numberStyle = .currency
+        formatter.currencyCode = subscription.currency
+        let amountText = formatter.string(from: subscription.amount as NSNumber) ?? "\(subscription.amount)"
+        
+        content.body = "\(reminderDays) gün sonra yenileniyor. Tutar: \(amountText)"
+        content.sound = .default
+        content.userInfo = ["subscriptionId": subscription.id.uuidString]
+        
+        // 3 saniye sonra tetikle
+        let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 3, repeats: false)
+        let request = UNNotificationRequest(identifier: "test-reminder-\(subscription.id.uuidString)", content: content, trigger: trigger)
+        
+        try? await center.add(request)
+    }
+    
+    /// Bekleyen bildirimleri listeler (debug için)
+    func getPendingNotifications() async -> [UNNotificationRequest] {
+        await center.pendingNotificationRequests()
     }
 }

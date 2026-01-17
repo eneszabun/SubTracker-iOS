@@ -9,13 +9,14 @@ enum AppTab: Hashable {
 
 struct ContentView: View {
     @StateObject private var auth = AuthViewModel()
+    @EnvironmentObject private var notificationManager: NotificationManager
     @State private var subscriptions: [Subscription]
     @State private var selectedTab: AppTab = .summary
     @AppStorage("colorSchemePreference") private var colorSchemePreference: String = "system"
     @AppStorage("reminderDays") private var reminderDays: Int = 3
     
-    /// Spotlight'tan seçilen abonelik ID'si
-    @State private var spotlightSelectedID: UUID?
+    /// Spotlight veya bildirimden seçilen abonelik ID'si
+    @State private var selectedSubscriptionID: UUID?
 
     init(initialSubscriptions: [Subscription] = []) {
         let stored = SubscriptionStore.shared.load()
@@ -34,7 +35,7 @@ struct ContentView: View {
 
                     SubscriptionListView(
                         subscriptions: $subscriptions,
-                        spotlightSelectedID: $spotlightSelectedID
+                        spotlightSelectedID: $selectedSubscriptionID
                     )
                         .tabItem {
                             Label("Abonelikler", systemImage: "creditcard.fill")
@@ -66,6 +67,10 @@ struct ContentView: View {
         .onContinueUserActivity(CSSearchableItemActionType) { userActivity in
             handleSpotlightActivity(userActivity)
         }
+        // Bildirimden abonelik seçildiğinde
+        .onChange(of: notificationManager.selectedSubscriptionId) { _, newId in
+            handleNotificationSelection(newId)
+        }
     }
 
     private var preferredScheme: ColorScheme? {
@@ -84,7 +89,24 @@ struct ContentView: View {
         
         // Abonelikler sekmesine geç ve seçili aboneliği ayarla
         selectedTab = .subscriptions
-        spotlightSelectedID = subscriptionID
+        selectedSubscriptionID = subscriptionID
+    }
+    
+    /// Bildirimden gelen abonelik seçimini işler
+    private func handleNotificationSelection(_ subscriptionId: UUID?) {
+        guard let id = subscriptionId else { return }
+        
+        // Abonelik mevcut mu kontrol et
+        if subscriptions.contains(where: { $0.id == id }) {
+            selectedTab = .subscriptions
+            // Küçük bir gecikme ile navigation'ın düzgün çalışmasını sağla
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                selectedSubscriptionID = id
+            }
+        }
+        
+        // ID'yi temizle (tekrar kullanılabilir olması için)
+        notificationManager.selectedSubscriptionId = nil
     }
 }
 

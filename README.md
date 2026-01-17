@@ -27,8 +27,8 @@ SwiftUI tabanli, abonelik ve düzenli harcama takibi uygulamasi. Kullanici tum a
 ### Kisa Vadeli Hedefler (v1.1)
 - [x] Widget destegi: ana ekranda toplam aylik gider ve yakin yenilemeler.
 - [x] Spotlight entegrasyonu: abonelikleri sistem aramasindan bulma.
+- [x] Bildirim deep link: bildirime tiklandiginda ilgili abonelik detay sayfasi acilir.
 - [ ] Gecmis odemeler bolumu: detay sayfasinda odeme gecmisi listesi.
-- [ ] CSV disari aktarma: abonelik listesini dosya olarak paylasma.
 
 ### Orta Vadeli Hedefler (v1.2)
 - [ ] Butce limiti: aylik harcama limiti belirleme ve asim uyarisi.
@@ -52,7 +52,7 @@ SwiftUI tabanli, abonelik ve düzenli harcama takibi uygulamasi. Kullanici tum a
 ### Kalite ve Test
 - [ ] Birim testleri: model ve hesaplama fonksiyonlari icin.
 - [ ] UI testleri: temel CRUD akislari icin otomasyon.
-- [ ] Bildirim testleri: zamanlama ve iptal senaryolari.
+- [x] Bildirim testleri: zamanlama ve iptal senaryolari.
 
 ## Mimarinin Cizgileri
 - Sunum: SwiftUI + ViewModel (ObservableObject) kombinasyonu, yalın state.
