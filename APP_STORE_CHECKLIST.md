@@ -63,8 +63,8 @@ Bu checklist'i yazdırabilir veya her adımı tamamladıkça işaretleyebilirsin
 - [ ] Support URL: `______________________________`
 
 ### Pricing & Availability
-- [ ] Price: **Free**
-- [ ] Availability: Tüm ülkeler ✅
+- [X] Price: **Free**
+- [X] Availability: Tüm ülkeler ✅
 
 ---
 
@@ -86,18 +86,18 @@ Bu checklist'i yazdırabilir veya her adımı tamamladıkça işaretleyebilirsin
 ## 5️⃣ Metadata
 
 ### App Name & Subtitle
-- [ ] Name: `SubTracker - Abonelik Takibi`
-- [ ] Subtitle: `Aboneliklerinizi Takip Edin`
+- [X] Name: `SubTracker - Abonelik Takibi`
+- [X] Subtitle: `Aboneliklerinizi Takip Edin`
 
 ### Description
-- [ ] `PRODUCTION_DEPLOYMENT_GUIDE.md`'deki açıklamayı kopyala-yapıştır
-- [ ] Gerekirse özelleştir
+- [X] `PRODUCTION_DEPLOYMENT_GUIDE.md`'deki açıklamayı kopyala-yapıştır
+- [X] Gerekirse özelleştir
 
 ### Keywords
-- [ ] `abonelik,takip,hatırlatma,netflix,spotify,harcama,bütçe,finans,para`
+- [X] `abonelik,takip,hatırlatma,netflix,spotify,harcama,bütçe,finans,para`
 
 ### Promotional Text
-- [ ] `Aboneliklerinizi takip edin, gereksiz harcamalardan kurtulun. 7 gün ücretsiz Pro deneyin!`
+- [X] `Aboneliklerinizi takip edin, gereksiz harcamalardan kurtulun. 7 gün ücretsiz Pro deneyin!`
 
 ---
 

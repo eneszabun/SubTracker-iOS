@@ -110,6 +110,8 @@ struct ContentView: View {
     }
 }
 
+#if DEBUG
 #Preview {
     ContentView(initialSubscriptions: Subscription.sample)
 }
+#endif

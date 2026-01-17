@@ -388,7 +388,8 @@ struct SettingsView: View {
                         icon: "hand.raised.fill",
                         iconBackground: palette.iconNotificationBackground,
                         iconColor: palette.iconNotification,
-                        title: "Gizlilik Politikası"
+                        title: "Gizlilik Politikası",
+                        value: nil
                     )
                 }
                 .buttonStyle(.plain)
@@ -403,7 +404,8 @@ struct SettingsView: View {
                         icon: "doc.text.fill",
                         iconBackground: palette.iconBudgetBackground,
                         iconColor: palette.iconBudget,
-                        title: "Kullanım Koşulları"
+                        title: "Kullanım Koşulları",
+                        value: nil
                     )
                 }
                 .buttonStyle(.plain)
@@ -418,7 +420,8 @@ struct SettingsView: View {
                         icon: "envelope.fill",
                         iconBackground: palette.iconCurrencyBackground,
                         iconColor: palette.iconCurrency,
-                        title: "Destek"
+                        title: "Destek",
+                        value: nil
                     )
                 }
                 .buttonStyle(.plain)
