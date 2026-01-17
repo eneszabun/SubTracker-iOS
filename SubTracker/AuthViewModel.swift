@@ -59,16 +59,21 @@ private enum KeychainHelper {
 final class AuthViewModel: ObservableObject {
     private static let userIdKey = "apple_user_id"
     private static let userNameKey = "apple_user_name"
+    private static let guestModeKey = "guest_mode"
     
     @Published var lastError: String?
     
     private var cachedUserId: String?
     private var cachedUserName: String?
+    private var isGuestMode: Bool = false
     
     init() {
         // Önce Keychain'den değerleri yükle
         cachedUserId = KeychainHelper.load(key: Self.userIdKey)
         cachedUserName = KeychainHelper.load(key: Self.userNameKey)
+        
+        // Guest mode kontrolü
+        isGuestMode = KeychainHelper.load(key: Self.guestModeKey) == "true"
         
         // AppStorage'dan Keychain'e migration (eski kullanıcılar için)
         migrateFromAppStorage()
@@ -95,7 +100,7 @@ final class AuthViewModel: ObservableObject {
     }
 
     var isSignedIn: Bool {
-        cachedUserId != nil
+        cachedUserId != nil || isGuestMode
     }
     
     var userDisplayName: String? {
@@ -112,6 +117,9 @@ final class AuthViewModel: ObservableObject {
     }
 
     var displayName: String {
+        if isGuestMode && cachedUserId == nil {
+            return "Misafir Kullanıcı"
+        }
         if let cachedUserName, !cachedUserName.isEmpty {
             return cachedUserName
         }
@@ -180,11 +188,19 @@ final class AuthViewModel: ObservableObject {
         return nameParts.joined(separator: " ")
     }
 
+    func continueAsGuest() {
+        isGuestMode = true
+        KeychainHelper.save(key: Self.guestModeKey, value: "true")
+        objectWillChange.send()
+    }
+    
     func signOut() {
         KeychainHelper.delete(key: Self.userIdKey)
         KeychainHelper.delete(key: Self.userNameKey)
+        KeychainHelper.delete(key: Self.guestModeKey)
         cachedUserId = nil
         cachedUserName = nil
+        isGuestMode = false
         lastError = nil
         objectWillChange.send()
     }
