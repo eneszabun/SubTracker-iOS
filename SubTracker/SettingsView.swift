@@ -935,7 +935,7 @@ private struct BudgetEditorSheet: View {
 
 // MARK: - Pro Upgrade Sheet
 
-private struct ProUpgradeSheet: View {
+struct ProUpgradeSheet: View {
     @ObservedObject var proManager: ProManager
     @StateObject private var storeManager = StoreManager.shared
     @Environment(\.dismiss) private var dismiss
