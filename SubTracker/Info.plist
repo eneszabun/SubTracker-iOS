@@ -35,13 +35,6 @@
         <string>UIInterfaceOrientationLandscapeLeft</string>
         <string>UIInterfaceOrientationLandscapeRight</string>
     </array>
-    <key>UISupportedInterfaceOrientations~ipad</key>
-    <array>
-        <string>UIInterfaceOrientationPortrait</string>
-        <string>UIInterfaceOrientationPortraitUpsideDown</string>
-        <string>UIInterfaceOrientationLandscapeLeft</string>
-        <string>UIInterfaceOrientationLandscapeRight</string>
-    </array>
     <key>NSUserNotificationsUsageDescription</key>
     <string>SubTracker abonelik yenileme tarihlerinizi hatırlatmak için bildirim göndermek istiyor.</string>
     <key>NSUserActivityTypes</key>
