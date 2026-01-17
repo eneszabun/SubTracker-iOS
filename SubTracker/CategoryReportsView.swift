@@ -308,11 +308,13 @@ struct CategoryReportsView: View {
     private func calculateAngle(from point: CGPoint, center: CGPoint) -> Double {
         let dx = point.x - center.x
         let dy = point.y - center.y
-        let radians = atan2(dy, dx)
+        
+        // SwiftUI: Y ekseni aşağı doğru pozitif, Charts üstten başlar (12 o'clock = 0°)
+        // atan2 kullanarak açıyı hesapla, ama dx ve -dy kullan (Y'yi ters çevir)
+        let radians = atan2(dx, -dy)
         var angle = radians * 180 / .pi
         
-        // Convert to 0-360 degrees, starting from top (12 o'clock)
-        angle += 90
+        // Negatif açıları 0-360 aralığına çevir
         if angle < 0 {
             angle += 360
         }
