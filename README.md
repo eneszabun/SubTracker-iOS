@@ -44,8 +44,11 @@ SwiftUI tabanli, abonelik ve düzenli harcama takibi uygulamasi. Kullanici tum a
     - Ileri raporlama: kategori bazli dagilim grafikleri (pie chart).
     - Genis bildirim ufku (30 gune kadar).
   - Deneme: 7 gun ucretsiz Pro denemesi.
+- [x] Siri kisayollari: sesli komutlarla abonelik sorgulama (iOS 16+).
+  - "SubTracker'da aylik harcamam ne kadar?"
+  - "SubTracker'da yaklasan yenilemelerim var mi?"
+  - "SubTracker'da aboneliklerimi goster"
 - [ ] Apple Watch uygulamasi: bilekte hizli ozet ve yakin yenilemeler.
-- [ ] Siri kisayollari: sesli komutlarla abonelik ekleme/sorgulama.
 - [ ] Aile paylasimi: ortak abonelikleri aile uyeleriyle takip etme.
 - [ ] Premium temalar: ozel renk semalari ve uygulama ikonlari.
 
@@ -65,3 +68,4 @@ SwiftUI tabanli, abonelik ve düzenli harcama takibi uygulamasi. Kullanici tum a
 - Xcode 15+ ve iOS 17+ hedeflenir.
 - Projeyi `SubTracker.xcodeproj` ile acip build/run.
 - **Pro ozellikleri test icin**: `STOREKIT_SETUP.md` dosyasindaki adimlari takip edin.
+- **Siri kisayollari icin**: `SIRI_SHORTCUTS.md` dosyasina bakin (iOS 16+ gerekli).
