@@ -69,3 +69,40 @@ SwiftUI tabanli, abonelik ve düzenli harcama takibi uygulamasi. Kullanici tum a
 - Projeyi `SubTracker.xcodeproj` ile acip build/run.
 - **Pro ozellikleri test icin**: `STOREKIT_SETUP.md` dosyasindaki adimlari takip edin.
 - **Siri kisayollari icin**: `SIRI_SHORTCUTS.md` dosyasina bakin (iOS 16+ gerekli).
+
+## 🚀 Production Deployment (App Store Yayinlama)
+
+Uygulamaniz App Store'a yayinlanmaya HAZIR! Asagidaki rehberlere bakin:
+
+### ⚡ YENİ BAŞLAYANLAR İÇİN
+**[QUICK_START.md](QUICK_START.md)** - 5 adimda App Store'a yayinlama (buradan baslayin!)
+
+### 🎯 TEKNİK ÖZET
+**[IMPLEMENTATION_SUMMARY.md](IMPLEMENTATION_SUMMARY.md)** - Neler yapildi, ne yapmaniz gerekiyor?
+
+### 📖 Detayli Rehberler
+1. **[APP_STORE_CHECKLIST.md](APP_STORE_CHECKLIST.md)** - Hizli checklist (yazdirabilir, isaretle-takip-et)
+2. **[PRODUCTION_DEPLOYMENT_GUIDE.md](PRODUCTION_DEPLOYMENT_GUIDE.md)** - 500+ satir kapsamli kilavuz (tum detaylar)
+
+### 📄 Yasal Doküman Templateleri
+1. **[PRIVACY_POLICY_TEMPLATE.md](PRIVACY_POLICY_TEMPLATE.md)** - Privacy Policy sablonu (düzenleyip web'e yukleyin)
+2. **[TERMS_OF_SERVICE_TEMPLATE.md](TERMS_OF_SERVICE_TEMPLATE.md)** - Terms of Service sablonu (düzenleyip web'e yukleyin)
+
+### ✅ Tamamlanan Kod Degisiklikleri
+- ✅ `AppConstants.swift` olusturuldu (Legal URL'leri icerir)
+- ✅ `Info.plist` guncellendi (Bildirim izinleri eklendi)
+- ✅ `SettingsView` guncellendi (Privacy Policy, Terms, Support linkleri eklendi)
+- ✅ App Icon tum boyutlarda mevcut
+- ✅ Xcode project dosyasi guncellendi
+
+### 🔧 Simdi Yapmaniz Gerekenler (Oncelik Sirasi)
+1. ⚠️ **ÖNCE BU!** `IMPLEMENTATION_SUMMARY.md` dosyasini okuyun
+2. **Privacy Policy ve Terms'i duzenleyin** (template'leri kullanin)
+3. **Web'e yukleyin** (GitHub Pages, Notion, vs.)
+4. **`SubTracker/AppConstants.swift`'te URL'leri guncelleyin** (placeholder'lari degistirin)
+5. **Xcode Scheme'den StoreKit Configuration'i kaldirin**
+6. **App Store Connect'te setup yapin** (checklist'i takip edin)
+7. **Archive olusturun ve upload edin**
+
+### 📞 Destek
+Her adim icin detayli aciklamalar dokumanlarda mevcut. Takildiyisniz `PRODUCTION_DEPLOYMENT_GUIDE.md`'deki "Sorun Giderme" bolumune bakin.

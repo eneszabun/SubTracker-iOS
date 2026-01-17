@@ -7,35 +7,37 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0BFB72C145A16C5B8FA4546B /* NewSubscriptionSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D20D865BECDAA954E473D69 /* NewSubscriptionSheet.swift */; };
+		13A008AC2F1B8BB0007BC82E /* SubTracker.storekit in Resources */ = {isa = PBXBuildFile; fileRef = 13A008AB2F1B8BB0007BC82E /* SubTracker.storekit */; };
+		187A100ECBB5DA4289FFE99A /* SubscriptionRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = C227FD3BABBE7F79E9FFD0F4 /* SubscriptionRow.swift */; };
+		1E007FC92529F48C5983C589 /* YearlyBreakdownView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4FC37CBA95C54BFBDCF1C06 /* YearlyBreakdownView.swift */; };
+		307452C6351FBC1FE98F5E65 /* NotificationScheduler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 445B53E1F22002DFB94473CA /* NotificationScheduler.swift */; };
+		34AC03BD61A7062EB58C2A67 /* AuthViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7C67D445D0983F129FAF2E0 /* AuthViewModel.swift */; };
+		44B6C3AAB2B46FB3FAEF09CB /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6615FD0F3ED6D33E4E147268 /* SettingsView.swift */; };
+		47D4552F00FCC53CBB77BDA0 /* SubscriptionListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96D84AA213FA9D28A176E5F8 /* SubscriptionListView.swift */; };
+		65A15D1896A38EFF7292795A /* SignInGateView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E21D7EEE34B68E6655DA08C1 /* SignInGateView.swift */; };
+		79BCAA1C690612504BED2B9E /* SubscriptionDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D4AB35EC155CE3FD1BD8880 /* SubscriptionDetailView.swift */; };
 		7E3B3F5F2A9A5E5A00DCCAB1 /* SubTrackerApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E3B3F5F2A9A5E5A00DCCA09 /* SubTrackerApp.swift */; };
 		7E3B3F5F2A9A5E5A00DCCAB2 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E3B3F5F2A9A5E5A00DCCA08 /* ContentView.swift */; };
-		34AC03BD61A7062EB58C2A67 /* AuthViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7C67D445D0983F129FAF2E0 /* AuthViewModel.swift */; };
-		D373E4DCEC218486C12CA3BE /* SubscriptionModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3584CF723E1FCBBBBACF317 /* SubscriptionModels.swift */; };
-		FB2F480BD9E234F482A175FD /* FormattingHelpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41E83CD197059B6F47B5C7BC /* FormattingHelpers.swift */; };
-		187A100ECBB5DA4289FFE99A /* SubscriptionRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = C227FD3BABBE7F79E9FFD0F4 /* SubscriptionRow.swift */; };
-		307452C6351FBC1FE98F5E65 /* NotificationScheduler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 445B53E1F22002DFB94473CA /* NotificationScheduler.swift */; };
-		D65F1A031213ABB54BF1F7EF /* SubscriptionStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 77B62ABA3B291540C9453C76 /* SubscriptionStore.swift */; };
-		AF721B637A16253777EC787C /* SummaryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4181CB8A354F904BC467D056 /* SummaryView.swift */; };
-		47D4552F00FCC53CBB77BDA0 /* SubscriptionListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96D84AA213FA9D28A176E5F8 /* SubscriptionListView.swift */; };
-		79BCAA1C690612504BED2B9E /* SubscriptionDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D4AB35EC155CE3FD1BD8880 /* SubscriptionDetailView.swift */; };
-		0BFB72C145A16C5B8FA4546B /* NewSubscriptionSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D20D865BECDAA954E473D69 /* NewSubscriptionSheet.swift */; };
-		65A15D1896A38EFF7292795A /* SignInGateView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E21D7EEE34B68E6655DA08C1 /* SignInGateView.swift */; };
-		44B6C3AAB2B46FB3FAEF09CB /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6615FD0F3ED6D33E4E147268 /* SettingsView.swift */; };
-		1E007FC92529F48C5983C589 /* YearlyBreakdownView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4FC37CBA95C54BFBDCF1C06 /* YearlyBreakdownView.swift */; };
 		7E3B3F5F2A9A5E5A00DCCAB3 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 7E3B3F5F2A9A5E5A00DCCA04 /* Assets.xcassets */; };
 		7E3B3F5F2A9A5E5A00DCCAB4 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 7E3B3F5F2A9A5E5A00DCCA0A /* Preview Assets.xcassets */; };
+		AF721B637A16253777EC787C /* SummaryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4181CB8A354F904BC467D056 /* SummaryView.swift */; };
 		BEF6A6AB2CFECC0B0030A1C1 /* SubscriptionEntity+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEF6A6A82CFECC0B0030A1C1 /* SubscriptionEntity+CoreDataClass.swift */; };
 		BEF6A6AC2CFECC0B0030A1C1 /* SubscriptionEntity+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEF6A6A92CFECC0B0030A1C1 /* SubscriptionEntity+CoreDataProperties.swift */; };
 		BEF6A6AD2CFECC0B0030A1C1 /* SubTracker.xcdatamodeld in Resources */ = {isa = PBXBuildFile; fileRef = BEF6A6AA2CFECC0B0030A1C1 /* SubTracker.xcdatamodeld */; };
+		CATREP0RT0001A2B3C4D5E6F /* CategoryReportsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CATREP0RT0002A2B3C4D5E6F /* CategoryReportsView.swift */; };
+		CURR3NCY0001A2B3C4D5E6F7 /* CurrencyConverter.swift in Sources */ = {isa = PBXBuildFile; fileRef = CURR3NCY0002A2B3C4D5E6F7 /* CurrencyConverter.swift */; };
+		D373E4DCEC218486C12CA3BE /* SubscriptionModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3584CF723E1FCBBBBACF317 /* SubscriptionModels.swift */; };
+		D65F1A031213ABB54BF1F7EF /* SubscriptionStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 77B62ABA3B291540C9453C76 /* SubscriptionStore.swift */; };
+		FB2F480BD9E234F482A175FD /* FormattingHelpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41E83CD197059B6F47B5C7BC /* FormattingHelpers.swift */; };
+		APPCONST0001A2B3C4D5E6F7 /* AppConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = APPCONST0002A2B3C4D5E6F7 /* AppConstants.swift */; };
+		PR0MNGR0001A2B3C4D5E6F7G /* ProManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = PR0MNGR0002A2B3C4D5E6F7G /* ProManager.swift */; };
 		SP0T1IGHT2D2F3G4H5I6J7K8 /* SpotlightManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = SP0T1IGHT1A2B3C4D5E6F7G8H /* SpotlightManager.swift */; };
+		ST0REMGR0001A2B3C4D5E6F7 /* StoreManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = ST0REMGR0002A2B3C4D5E6F7 /* StoreManager.swift */; };
 		W1DG3T0001A2B3C4D5E6F7G8 /* WidgetDataManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = W1DG3T0002A2B3C4D5E6F7G8 /* WidgetDataManager.swift */; };
 		W1DG3T0003A2B3C4D5E6F7G8 /* SubTrackerWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = W1DG3T0004A2B3C4D5E6F7G8 /* SubTrackerWidget.swift */; };
 		W1DG3T0005A2B3C4D5E6F7G8 /* WidgetDataManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = W1DG3T0002A2B3C4D5E6F7G8 /* WidgetDataManager.swift */; };
 		W1DG3T0006A2B3C4D5E6F7G8 /* SubTrackerWidgetExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = W1DG3T0007A2B3C4D5E6F7G8 /* SubTrackerWidgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
-		CURR3NCY0001A2B3C4D5E6F7 /* CurrencyConverter.swift in Sources */ = {isa = PBXBuildFile; fileRef = CURR3NCY0002A2B3C4D5E6F7 /* CurrencyConverter.swift */; };
-		PR0MNGR0001A2B3C4D5E6F7G /* ProManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = PR0MNGR0002A2B3C4D5E6F7G /* ProManager.swift */; };
-		ST0REMGR0001A2B3C4D5E6F7 /* StoreManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = ST0REMGR0002A2B3C4D5E6F7 /* StoreManager.swift */; };
-		CATREP0RT0001A2B3C4D5E6F /* CategoryReportsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CATREP0RT0002A2B3C4D5E6F /* CategoryReportsView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -63,39 +65,41 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		0D4AB35EC155CE3FD1BD8880 /* SubscriptionDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubscriptionDetailView.swift; sourceTree = "<group>"; };
 		1312D35C2EEEE6640075B3CC /* SubTracker.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = SubTracker.entitlements; sourceTree = "<group>"; };
+		13A008AB2F1B8BB0007BC82E /* SubTracker.storekit */ = {isa = PBXFileReference; lastKnownFileType = text; path = SubTracker.storekit; sourceTree = "<group>"; };
+		4181CB8A354F904BC467D056 /* SummaryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SummaryView.swift; sourceTree = "<group>"; };
+		41E83CD197059B6F47B5C7BC /* FormattingHelpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FormattingHelpers.swift; sourceTree = "<group>"; };
+		APPCONST0002A2B3C4D5E6F7 /* AppConstants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppConstants.swift; sourceTree = "<group>"; };
+		445B53E1F22002DFB94473CA /* NotificationScheduler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationScheduler.swift; sourceTree = "<group>"; };
+		6615FD0F3ED6D33E4E147268 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		77B62ABA3B291540C9453C76 /* SubscriptionStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubscriptionStore.swift; sourceTree = "<group>"; };
 		7E3B3F5F2A9A5E5A00DCCA04 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		7E3B3F5F2A9A5E5A00DCCA06 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		7E3B3F5F2A9A5E5A00DCCA08 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
-		E7C67D445D0983F129FAF2E0 /* AuthViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthViewModel.swift; sourceTree = "<group>"; };
-		C3584CF723E1FCBBBBACF317 /* SubscriptionModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubscriptionModels.swift; sourceTree = "<group>"; };
-		41E83CD197059B6F47B5C7BC /* FormattingHelpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FormattingHelpers.swift; sourceTree = "<group>"; };
-		C227FD3BABBE7F79E9FFD0F4 /* SubscriptionRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubscriptionRow.swift; sourceTree = "<group>"; };
-		445B53E1F22002DFB94473CA /* NotificationScheduler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationScheduler.swift; sourceTree = "<group>"; };
-		77B62ABA3B291540C9453C76 /* SubscriptionStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubscriptionStore.swift; sourceTree = "<group>"; };
-		4181CB8A354F904BC467D056 /* SummaryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SummaryView.swift; sourceTree = "<group>"; };
-		96D84AA213FA9D28A176E5F8 /* SubscriptionListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubscriptionListView.swift; sourceTree = "<group>"; };
-		0D4AB35EC155CE3FD1BD8880 /* SubscriptionDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubscriptionDetailView.swift; sourceTree = "<group>"; };
-		8D20D865BECDAA954E473D69 /* NewSubscriptionSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewSubscriptionSheet.swift; sourceTree = "<group>"; };
-		E21D7EEE34B68E6655DA08C1 /* SignInGateView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignInGateView.swift; sourceTree = "<group>"; };
-		6615FD0F3ED6D33E4E147268 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
-		F4FC37CBA95C54BFBDCF1C06 /* YearlyBreakdownView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = YearlyBreakdownView.swift; sourceTree = "<group>"; };
 		7E3B3F5F2A9A5E5A00DCCA09 /* SubTrackerApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubTrackerApp.swift; sourceTree = "<group>"; };
 		7E3B3F5F2A9A5E5A00DCCA0A /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		7E3B3F5F2A9A5E5A00DCCA20 /* SubTracker.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SubTracker.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		8D20D865BECDAA954E473D69 /* NewSubscriptionSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewSubscriptionSheet.swift; sourceTree = "<group>"; };
+		96D84AA213FA9D28A176E5F8 /* SubscriptionListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubscriptionListView.swift; sourceTree = "<group>"; };
 		BEF6A6A82CFECC0B0030A1C1 /* SubscriptionEntity+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SubscriptionEntity+CoreDataClass.swift"; sourceTree = "<group>"; };
 		BEF6A6A92CFECC0B0030A1C1 /* SubscriptionEntity+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SubscriptionEntity+CoreDataProperties.swift"; sourceTree = "<group>"; };
 		BEF6A6AA2CFECC0B0030A1C1 /* SubTracker.xcdatamodeld */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodeld; path = SubTracker.xcdatamodeld; sourceTree = "<group>"; };
+		C227FD3BABBE7F79E9FFD0F4 /* SubscriptionRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubscriptionRow.swift; sourceTree = "<group>"; };
+		C3584CF723E1FCBBBBACF317 /* SubscriptionModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubscriptionModels.swift; sourceTree = "<group>"; };
+		CATREP0RT0002A2B3C4D5E6F /* CategoryReportsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoryReportsView.swift; sourceTree = "<group>"; };
+		CURR3NCY0002A2B3C4D5E6F7 /* CurrencyConverter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurrencyConverter.swift; sourceTree = "<group>"; };
+		E21D7EEE34B68E6655DA08C1 /* SignInGateView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignInGateView.swift; sourceTree = "<group>"; };
+		E7C67D445D0983F129FAF2E0 /* AuthViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthViewModel.swift; sourceTree = "<group>"; };
+		F4FC37CBA95C54BFBDCF1C06 /* YearlyBreakdownView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = YearlyBreakdownView.swift; sourceTree = "<group>"; };
+		PR0MNGR0002A2B3C4D5E6F7G /* ProManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProManager.swift; sourceTree = "<group>"; };
 		SP0T1IGHT1A2B3C4D5E6F7G8H /* SpotlightManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpotlightManager.swift; sourceTree = "<group>"; };
+		ST0REMGR0002A2B3C4D5E6F7 /* StoreManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoreManager.swift; sourceTree = "<group>"; };
 		W1DG3T0002A2B3C4D5E6F7G8 /* WidgetDataManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidgetDataManager.swift; sourceTree = "<group>"; };
 		W1DG3T0004A2B3C4D5E6F7G8 /* SubTrackerWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubTrackerWidget.swift; sourceTree = "<group>"; };
 		W1DG3T0007A2B3C4D5E6F7G8 /* SubTrackerWidgetExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = SubTrackerWidgetExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		W1DG3T0011A2B3C4D5E6F7G8 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		W1DG3T0012A2B3C4D5E6F7G8 /* SubTrackerWidget.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = SubTrackerWidget.entitlements; sourceTree = "<group>"; };
-		CURR3NCY0002A2B3C4D5E6F7 /* CurrencyConverter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurrencyConverter.swift; sourceTree = "<group>"; };
-		PR0MNGR0002A2B3C4D5E6F7G /* ProManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProManager.swift; sourceTree = "<group>"; };
-		ST0REMGR0002A2B3C4D5E6F7 /* StoreManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoreManager.swift; sourceTree = "<group>"; };
-		CATREP0RT0002A2B3C4D5E6F /* CategoryReportsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoryReportsView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -144,11 +148,13 @@
 				E7C67D445D0983F129FAF2E0 /* AuthViewModel.swift */,
 				C3584CF723E1FCBBBBACF317 /* SubscriptionModels.swift */,
 				41E83CD197059B6F47B5C7BC /* FormattingHelpers.swift */,
+				APPCONST0002A2B3C4D5E6F7 /* AppConstants.swift */,
 				C227FD3BABBE7F79E9FFD0F4 /* SubscriptionRow.swift */,
 				445B53E1F22002DFB94473CA /* NotificationScheduler.swift */,
 				77B62ABA3B291540C9453C76 /* SubscriptionStore.swift */,
 				SP0T1IGHT1A2B3C4D5E6F7G8H /* SpotlightManager.swift */,
 				4181CB8A354F904BC467D056 /* SummaryView.swift */,
+				13A008AB2F1B8BB0007BC82E /* SubTracker.storekit */,
 				96D84AA213FA9D28A176E5F8 /* SubscriptionListView.swift */,
 				0D4AB35EC155CE3FD1BD8880 /* SubscriptionDetailView.swift */,
 				8D20D865BECDAA954E473D69 /* NewSubscriptionSheet.swift */,
@@ -276,6 +282,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				13A008AC2F1B8BB0007BC82E /* SubTracker.storekit in Resources */,
 				7E3B3F5F2A9A5E5A00DCCAB3 /* Assets.xcassets in Resources */,
 				7E3B3F5F2A9A5E5A00DCCAB4 /* Preview Assets.xcassets in Resources */,
 				BEF6A6AD2CFECC0B0030A1C1 /* SubTracker.xcdatamodeld in Resources */,
@@ -301,6 +308,7 @@
 				34AC03BD61A7062EB58C2A67 /* AuthViewModel.swift in Sources */,
 				D373E4DCEC218486C12CA3BE /* SubscriptionModels.swift in Sources */,
 				FB2F480BD9E234F482A175FD /* FormattingHelpers.swift in Sources */,
+				APPCONST0001A2B3C4D5E6F7 /* AppConstants.swift in Sources */,
 				187A100ECBB5DA4289FFE99A /* SubscriptionRow.swift in Sources */,
 				307452C6351FBC1FE98F5E65 /* NotificationScheduler.swift in Sources */,
 				D65F1A031213ABB54BF1F7EF /* SubscriptionStore.swift in Sources */,

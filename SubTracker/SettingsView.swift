@@ -32,6 +32,7 @@ struct SettingsView: View {
                     budgetSection
                     syncSection
                     notificationSection
+                    legalSection
                     signOutSection
                 }
                 .padding(.horizontal, 16)
@@ -374,6 +375,57 @@ struct SettingsView: View {
         }
     }
 
+    private var legalSection: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            sectionHeader("Yasal")
+            
+            SettingsCard(palette: palette) {
+                Button {
+                    AppConstants.openPrivacyPolicy()
+                } label: {
+                    SettingsRow(
+                        palette: palette,
+                        icon: "hand.raised.fill",
+                        iconBackground: palette.iconNotificationBackground,
+                        iconColor: palette.iconNotification,
+                        title: "Gizlilik Politikası"
+                    )
+                }
+                .buttonStyle(.plain)
+                
+                SettingsDivider(palette: palette)
+                
+                Button {
+                    AppConstants.openTermsOfService()
+                } label: {
+                    SettingsRow(
+                        palette: palette,
+                        icon: "doc.text.fill",
+                        iconBackground: palette.iconBudgetBackground,
+                        iconColor: palette.iconBudget,
+                        title: "Kullanım Koşulları"
+                    )
+                }
+                .buttonStyle(.plain)
+                
+                SettingsDivider(palette: palette)
+                
+                Button {
+                    AppConstants.openSupport()
+                } label: {
+                    SettingsRow(
+                        palette: palette,
+                        icon: "envelope.fill",
+                        iconBackground: palette.iconCurrencyBackground,
+                        iconColor: palette.iconCurrency,
+                        title: "Destek"
+                    )
+                }
+                .buttonStyle(.plain)
+            }
+        }
+    }
+    
     private var signOutSection: some View {
         VStack(spacing: 16) {
             Button {

@@ -42,5 +42,13 @@
         <string>UIInterfaceOrientationLandscapeLeft</string>
         <string>UIInterfaceOrientationLandscapeRight</string>
     </array>
+    <key>NSUserNotificationsUsageDescription</key>
+    <string>SubTracker abonelik yenileme tarihlerinizi hatırlatmak için bildirim göndermek istiyor.</string>
+    <key>NSUserActivityTypes</key>
+    <array>
+        <string>GetMonthlyTotalIntent</string>
+        <string>GetSubscriptionsIntent</string>
+        <string>GetUpcomingRenewalsIntent</string>
+    </array>
 </dict>
 </plist>
