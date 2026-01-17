@@ -1,4 +1,5 @@
 import SwiftUI
+import StoreKit
 
 struct SettingsView: View {
     @ObservedObject var auth: AuthViewModel
@@ -996,7 +997,7 @@ private struct ProUpgradeSheet: View {
                         VStack(spacing: 12) {
                             Image(systemName: "exclamationmark.triangle")
                                 .font(.system(size: 32, weight: .light))
-                                .foregroundStyle(palette.textMuted.opacity(0.5))
+                                .foregroundStyle(palette.textSecondary.opacity(0.5))
                             Text("Ürünler yüklenemedi")
                                 .font(.system(size: 14, weight: .medium))
                                 .foregroundStyle(palette.textSecondary)
@@ -1014,7 +1015,12 @@ private struct ProUpgradeSheet: View {
                         VStack(spacing: 16) {
                             ForEach(storeManager.products, id: \.id) { product in
                                 let isYearly = product.id == StoreManager.ProductID.proYearly.rawValue
-                                let isPurchasing = case .purchasing = storeManager.purchaseState
+                                let isPurchasing: Bool = {
+                                    if case .purchasing = storeManager.purchaseState {
+                                        return true
+                                    }
+                                    return false
+                                }()
                                 
                                 ProPlanCard(
                                     title: isYearly ? "Yıllık" : "Aylık",
