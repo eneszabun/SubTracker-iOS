@@ -8,9 +8,6 @@ struct CategoryReportsView: View {
     @Environment(\.colorScheme) private var colorScheme
     @Environment(\.dismiss) private var dismiss
     
-    @State private var selectedCategory: Subscription.Category?
-    @State private var selectedAngle: Double?
-    
     private var palette: ReportsPalette {
         ReportsPalette(scheme: colorScheme)
     }
@@ -67,61 +64,28 @@ struct CategoryReportsView: View {
                 .foregroundStyle(palette.textPrimary)
             
             VStack(spacing: 20) {
-                // Chart with interactive popup
-                GeometryReader { geometry in
-                    ZStack {
-                        if #available(iOS 17.0, *) {
-                            Chart(categoryData, id: \.category) { data in
-                                SectorMark(
-                                    angle: .value("Tutar", data.total),
-                                    innerRadius: .ratio(0.5),
-                                    angularInset: 2
-                                )
-                                .foregroundStyle(data.category.color)
-                                .cornerRadius(4)
-                            }
-                            .chartAngleSelection(value: $selectedAngle)
-                            .onChange(of: selectedAngle) { oldValue, newValue in
-                                withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
-                                    if let angle = newValue {
-                                        selectedCategory = findCategory(for: angle)
-                                    } else {
-                                        selectedCategory = nil
-                                    }
-                                }
-                            }
-                        } else if #available(iOS 16.0, *) {
-                            Chart(categoryData, id: \.category) { data in
-                                SectorMark(
-                                    angle: .value("Tutar", data.total),
-                                    innerRadius: .ratio(0.5),
-                                    angularInset: 2
-                                )
-                                .foregroundStyle(data.category.color)
-                                .cornerRadius(4)
-                            }
-                            .overlay(
-                                chartTapOverlay(in: geometry)
-                            )
-                        } else {
-                            // iOS 16 altı için basit görsel
-                            Circle()
-                                .fill(palette.primary.opacity(0.2))
-                                .overlay(
-                                    Text("iOS 16+")
-                                        .foregroundStyle(palette.textSecondary)
-                                )
-                        }
-                        
-                        // Category popup
-                        if let category = selectedCategory,
-                           let data = categoryData.first(where: { $0.category == category }) {
-                            categoryPopup(for: data)
-                                .transition(.scale.combined(with: .opacity))
-                        }
+                // Chart
+                if #available(iOS 16.0, *) {
+                    Chart(categoryData, id: \.category) { data in
+                        SectorMark(
+                            angle: .value("Tutar", data.total),
+                            innerRadius: .ratio(0.5),
+                            angularInset: 2
+                        )
+                        .foregroundStyle(data.category.color)
+                        .cornerRadius(4)
                     }
+                    .frame(height: 250)
+                } else {
+                    // iOS 16 altı için basit görsel
+                    Circle()
+                        .fill(palette.primary.opacity(0.2))
+                        .frame(height: 250)
+                        .overlay(
+                            Text("iOS 16+")
+                                .foregroundStyle(palette.textSecondary)
+                        )
                 }
-                .frame(height: 250)
                 
                 // Total
                 VStack(spacing: 4) {
@@ -207,119 +171,6 @@ struct CategoryReportsView: View {
         formatter.numberStyle = .currency
         formatter.currencyCode = defaultCurrency
         return formatter.string(from: value as NSNumber) ?? "\(value)"
-    }
-    
-    // MARK: - Interactive Chart Helpers
-    
-    private func findCategory(for angle: Double) -> Subscription.Category? {
-        var accumulatedAngle: Double = 0
-        
-        for data in categoryData {
-            let segmentAngle = (data.total / totalMonthly) * 360
-            accumulatedAngle += segmentAngle
-            
-            if angle <= accumulatedAngle {
-                return data.category
-            }
-        }
-        
-        return categoryData.first?.category
-    }
-    
-    private func categoryPopup(for data: (category: Subscription.Category, total: Double, count: Int)) -> some View {
-        VStack(spacing: 8) {
-            // Icon
-            Image(systemName: SubscriptionIconProvider.iconName(for: data.category))
-                .font(.system(size: 24, weight: .semibold))
-                .foregroundStyle(data.category.color)
-                .frame(width: 48, height: 48)
-                .background(data.category.color.opacity(0.15), in: Circle())
-            
-            // Category name
-            Text(data.category.displayName)
-                .font(.system(size: 16, weight: .bold))
-                .foregroundStyle(palette.textPrimary)
-            
-            // Amount
-            Text(formattedAmount(data.total))
-                .font(.system(size: 20, weight: .black))
-                .foregroundStyle(data.category.color)
-            
-            // Percentage and count
-            HStack(spacing: 12) {
-                let percentage = totalMonthly > 0 ? (data.total / totalMonthly) * 100 : 0
-                Text(String(format: "%.0f%%", percentage))
-                    .font(.system(size: 13, weight: .semibold))
-                    .foregroundStyle(palette.textSecondary)
-                
-                Text("•")
-                    .foregroundStyle(palette.textSecondary.opacity(0.5))
-                
-                Text("\(data.count) abonelik")
-                    .font(.system(size: 13, weight: .medium))
-                    .foregroundStyle(palette.textSecondary)
-            }
-        }
-        .padding(16)
-        .background(
-            RoundedRectangle(cornerRadius: 16, style: .continuous)
-                .fill(palette.surface)
-                .shadow(color: .black.opacity(0.2), radius: 20, x: 0, y: 8)
-        )
-        .overlay(
-            RoundedRectangle(cornerRadius: 16, style: .continuous)
-                .stroke(data.category.color.opacity(0.3), lineWidth: 2)
-        )
-        .onTapGesture {
-            withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
-                selectedCategory = nil
-                selectedAngle = nil
-            }
-        }
-    }
-    
-    @available(iOS 16.0, *)
-    private func chartTapOverlay(in geometry: GeometryProxy) -> some View {
-        Color.clear
-            .contentShape(Rectangle())
-            .gesture(
-                DragGesture(minimumDistance: 0)
-                    .onEnded { value in
-                        let center = CGPoint(
-                            x: geometry.size.width / 2,
-                            y: geometry.size.height / 2
-                        )
-                        let angle = calculateAngle(from: value.location, center: center)
-                        
-                        withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
-                            if let currentAngle = selectedAngle, abs(currentAngle - angle) < 5 {
-                                // Same category tapped, close popup
-                                selectedAngle = nil
-                                selectedCategory = nil
-                            } else {
-                                selectedAngle = angle
-                                selectedCategory = findCategory(for: angle)
-                            }
-                        }
-                    }
-            )
-    }
-    
-    private func calculateAngle(from point: CGPoint, center: CGPoint) -> Double {
-        let dx = point.x - center.x
-        let dy = point.y - center.y
-        
-        // SwiftUI: Y ekseni aşağı doğru pozitif, Charts üstten başlar (12 o'clock = 0°)
-        // atan2 kullanarak açıyı hesapla, ama dx ve -dy kullan (Y'yi ters çevir)
-        let radians = atan2(dx, -dy)
-        var angle = radians * 180 / .pi
-        
-        // Negatif açıları 0-360 aralığına çevir
-        if angle < 0 {
-            angle += 360
-        }
-        
-        return angle
     }
 }
 
