@@ -43,5 +43,7 @@
         <string>GetSubscriptionsIntent</string>
         <string>GetUpcomingRenewalsIntent</string>
     </array>
+    <key>ITSAppUsesNonExemptEncryption</key>
+    <false/>
 </dict>
 </plist>
