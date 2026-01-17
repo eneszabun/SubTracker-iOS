@@ -12,8 +12,8 @@ struct AppConstants {
     /// Terms of Service URL - IMPORTANT: Replace with your actual URL before production
     static let termsOfServiceURL = "https://eneszabun.github.io/SubTracker-iOS/terms-of-service.html"
     
-    /// Support URL - IMPORTANT: Replace with your actual support URL/email
-    static let supportURL = "mailto:enes.sefa.zabun@gmail.com"
+    /// Support URL - Web support page
+    static let supportURL = "https://eneszabun.github.io/SubTracker-iOS/support.html"
     
     // MARK: - App Store
     
