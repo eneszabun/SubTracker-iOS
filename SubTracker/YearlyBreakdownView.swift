@@ -5,8 +5,10 @@ struct YearlyBreakdownView: View {
     let breakdown: [MonthlyCost]
     let currencyCode: String
     let yearlyTotal: Double
+    let subscriptions: [Subscription]
     @Environment(\.colorScheme) private var colorScheme
     @State private var selectedIndex: Int?
+    @State private var showingMonthDetail = false
     
     var body: some View {
         Group {
@@ -19,6 +21,18 @@ struct YearlyBreakdownView: View {
         .navigationTitle("Yıllık Detay")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar(.visible, for: .navigationBar)
+        .sheet(isPresented: $showingMonthDetail) {
+            if let index = selectedIndex, breakdown.indices.contains(index) {
+                MonthDetailSheet(
+                    month: breakdown[index],
+                    subscriptions: subscriptionsRenewing(in: breakdown[index].date),
+                    currencyCode: currencyCode,
+                    isLight: colorScheme == .light
+                )
+                .presentationDetents([.medium, .large])
+                .presentationDragIndicator(.visible)
+            }
+        }
     }
     
     // MARK: - Light Mode
@@ -220,34 +234,96 @@ struct YearlyBreakdownView: View {
     
     private func selectedMonthCard(month: MonthlyCost, isLight: Bool) -> some View {
         let palette = YearlyPaletteValues.palette(isLight: isLight)
+        let subscriptionsForMonth = subscriptionsRenewing(in: month.date)
         
-        return HStack(spacing: 12) {
-            VStack(alignment: .leading, spacing: 4) {
-                Text(month.fullMonthLabel.capitalized)
-                    .font(.system(size: 16, weight: .bold))
-                    .foregroundStyle(palette.textPrimary)
-                
-                Text("Tahmini gider")
-                    .font(.system(size: 12, weight: .medium))
-                    .foregroundStyle(palette.textMuted)
+        return Button {
+            if !subscriptionsForMonth.isEmpty {
+                showingMonthDetail = true
             }
-            
-            Spacer()
-            
-            Text(formattedAmount(month.total))
-                .font(.system(size: 20, weight: .black))
-                .foregroundStyle(palette.primary)
+        } label: {
+            HStack(spacing: 12) {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(month.fullMonthLabel.capitalized)
+                        .font(.system(size: 16, weight: .bold))
+                        .foregroundStyle(palette.textPrimary)
+                    
+                    HStack(spacing: 4) {
+                        Text("Tahmini gider")
+                            .font(.system(size: 12, weight: .medium))
+                            .foregroundStyle(palette.textMuted)
+                        
+                        if !subscriptionsForMonth.isEmpty {
+                            Text("•")
+                                .foregroundStyle(palette.textMuted)
+                            Text("\(subscriptionsForMonth.count) abonelik")
+                                .font(.system(size: 12, weight: .semibold))
+                                .foregroundStyle(palette.primary)
+                        }
+                    }
+                }
+                
+                Spacer()
+                
+                HStack(spacing: 8) {
+                    Text(formattedAmount(month.total))
+                        .font(.system(size: 20, weight: .black))
+                        .foregroundStyle(palette.primary)
+                    
+                    if !subscriptionsForMonth.isEmpty {
+                        Image(systemName: "chevron.right")
+                            .font(.system(size: 12, weight: .bold))
+                            .foregroundStyle(palette.primary.opacity(0.6))
+                    }
+                }
+            }
+            .padding(16)
+            .background(palette.primary.opacity(0.08), in: RoundedRectangle(cornerRadius: 16, style: .continuous))
+            .overlay(
+                RoundedRectangle(cornerRadius: 16, style: .continuous)
+                    .stroke(palette.primary.opacity(0.2), lineWidth: 1)
+            )
         }
-        .padding(16)
-        .background(palette.primary.opacity(0.08), in: RoundedRectangle(cornerRadius: 16, style: .continuous))
-        .overlay(
-            RoundedRectangle(cornerRadius: 16, style: .continuous)
-                .stroke(palette.primary.opacity(0.2), lineWidth: 1)
-        )
+        .buttonStyle(.plain)
         .transition(.asymmetric(
             insertion: .scale(scale: 0.9).combined(with: .opacity),
             removal: .opacity
         ))
+    }
+    
+    /// Belirli bir ay içinde yenilenecek abonelikleri döndürür
+    private func subscriptionsRenewing(in monthDate: Date) -> [Subscription] {
+        let calendar = Calendar.current
+        let targetMonth = calendar.component(.month, from: monthDate)
+        let targetYear = calendar.component(.year, from: monthDate)
+        
+        return subscriptions.filter { subscription in
+            guard subscription.isActive else { return false }
+            
+            let stepMonths = subscription.cycle == .monthly ? 1 : 12
+            var renewalDate = subscription.upcomingRenewalDate
+            
+            // Hedef aya kadar ilerle
+            let startOfTargetMonth = calendar.date(from: DateComponents(year: targetYear, month: targetMonth, day: 1)) ?? monthDate
+            let endOfTargetMonth = calendar.date(byAdding: DateComponents(month: 1, day: -1), to: startOfTargetMonth) ?? monthDate
+            
+            // Geçmişteyse ilerlet
+            while renewalDate < startOfTargetMonth {
+                if let end = subscription.endDate, renewalDate > end { return false }
+                guard let advanced = calendar.date(byAdding: .month, value: stepMonths, to: renewalDate) else { return false }
+                renewalDate = advanced
+            }
+            
+            // Hedef ay içinde mi kontrol et
+            let renewalMonth = calendar.component(.month, from: renewalDate)
+            let renewalYear = calendar.component(.year, from: renewalDate)
+            
+            if renewalMonth == targetMonth && renewalYear == targetYear {
+                if let end = subscription.endDate, renewalDate > end { return false }
+                return true
+            }
+            
+            return false
+        }
     }
     
     private func monthlyDetailsSection(isLight: Bool) -> some View {
@@ -416,5 +492,202 @@ extension MonthlyCost {
         formatter.locale = Locale(identifier: "tr_TR")
         formatter.dateFormat = "MMMM yyyy"
         return formatter.string(from: date)
+    }
+}
+
+// MARK: - Month Detail Sheet
+
+private struct MonthDetailSheet: View {
+    let month: MonthlyCost
+    let subscriptions: [Subscription]
+    let currencyCode: String
+    let isLight: Bool
+    
+    @Environment(\.dismiss) private var dismiss
+    
+    private var palette: YearlyPaletteValues {
+        YearlyPaletteValues.palette(isLight: isLight)
+    }
+    
+    private let dateFormatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "tr_TR")
+        formatter.dateFormat = "d MMMM"
+        return formatter
+    }()
+    
+    var body: some View {
+        NavigationStack {
+            ScrollView {
+                VStack(spacing: 16) {
+                    // Header Summary
+                    headerCard
+                    
+                    // Subscription List
+                    if subscriptions.isEmpty {
+                        emptyState
+                    } else {
+                        subscriptionList
+                    }
+                }
+                .padding(16)
+            }
+            .scrollIndicators(.hidden)
+            .background(palette.background)
+            .navigationTitle(month.fullMonthLabel.capitalized)
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("Kapat") {
+                        dismiss()
+                    }
+                    .fontWeight(.semibold)
+                }
+            }
+        }
+    }
+    
+    private var headerCard: some View {
+        VStack(spacing: 12) {
+            HStack(spacing: 12) {
+                ZStack {
+                    Circle()
+                        .fill(palette.primary.opacity(0.15))
+                        .frame(width: 48, height: 48)
+                    Image(systemName: "calendar.badge.clock")
+                        .font(.system(size: 20, weight: .semibold))
+                        .foregroundStyle(palette.primary)
+                }
+                
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("Tahmini Gider")
+                        .font(.system(size: 13, weight: .medium))
+                        .foregroundStyle(palette.textMuted)
+                    Text(formattedAmount(month.total))
+                        .font(.system(size: 24, weight: .black))
+                        .foregroundStyle(palette.textPrimary)
+                }
+                
+                Spacer()
+            }
+            
+            Divider()
+                .background(palette.border)
+            
+            HStack {
+                Label("\(subscriptions.count) abonelik", systemImage: "creditcard.fill")
+                    .font(.system(size: 13, weight: .semibold))
+                    .foregroundStyle(palette.textMuted)
+                
+                Spacer()
+                
+                Text("bu ay yenilenecek")
+                    .font(.system(size: 12, weight: .medium))
+                    .foregroundStyle(palette.textMuted.opacity(0.8))
+            }
+        }
+        .padding(16)
+        .background(palette.surface, in: RoundedRectangle(cornerRadius: 20, style: .continuous))
+        .overlay(
+            RoundedRectangle(cornerRadius: 20, style: .continuous)
+                .stroke(palette.border, lineWidth: 1)
+        )
+    }
+    
+    private var emptyState: some View {
+        VStack(spacing: 12) {
+            Image(systemName: "checkmark.circle")
+                .font(.system(size: 40, weight: .light))
+                .foregroundStyle(palette.textMuted.opacity(0.5))
+            
+            Text("Bu ay ödeme yok")
+                .font(.system(size: 15, weight: .medium))
+                .foregroundStyle(palette.textMuted)
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.vertical, 40)
+    }
+    
+    private var subscriptionList: some View {
+        VStack(spacing: 8) {
+            ForEach(subscriptions) { subscription in
+                subscriptionRow(subscription)
+            }
+        }
+    }
+    
+    private func subscriptionRow(_ subscription: Subscription) -> some View {
+        HStack(spacing: 12) {
+            // Icon
+            Image(systemName: subscription.icon)
+                .font(.system(size: 16, weight: .semibold))
+                .foregroundStyle(Color.white)
+                .frame(width: 44, height: 44)
+                .background(subscription.category.color, in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+            
+            // Details
+            VStack(alignment: .leading, spacing: 4) {
+                Text(subscription.name)
+                    .font(.system(size: 15, weight: .bold))
+                    .foregroundStyle(palette.textPrimary)
+                
+                HStack(spacing: 6) {
+                    Text(subscription.cycle == .yearly ? "Yıllık" : "Aylık")
+                        .font(.system(size: 11, weight: .semibold))
+                        .foregroundStyle(palette.textMuted)
+                    
+                    Text("•")
+                        .foregroundStyle(palette.textMuted.opacity(0.5))
+                    
+                    Text(renewalDateText(for: subscription))
+                        .font(.system(size: 11, weight: .medium))
+                        .foregroundStyle(palette.primary)
+                }
+            }
+            
+            Spacer()
+            
+            // Amount
+            VStack(alignment: .trailing, spacing: 2) {
+                Text(subscription.formattedAmount)
+                    .font(.system(size: 15, weight: .bold))
+                    .foregroundStyle(palette.textPrimary)
+                
+                Text(subscription.cycle == .yearly ? "/yıl" : "/ay")
+                    .font(.system(size: 10, weight: .semibold))
+                    .foregroundStyle(palette.textMuted)
+            }
+        }
+        .padding(14)
+        .background(palette.surface, in: RoundedRectangle(cornerRadius: 16, style: .continuous))
+        .overlay(
+            RoundedRectangle(cornerRadius: 16, style: .continuous)
+                .stroke(palette.border, lineWidth: 1)
+        )
+    }
+    
+    private func renewalDateText(for subscription: Subscription) -> String {
+        let calendar = Calendar.current
+        let targetMonth = calendar.component(.month, from: month.date)
+        let targetYear = calendar.component(.year, from: month.date)
+        
+        let stepMonths = subscription.cycle == .monthly ? 1 : 12
+        var renewalDate = subscription.upcomingRenewalDate
+        
+        let startOfTargetMonth = calendar.date(from: DateComponents(year: targetYear, month: targetMonth, day: 1)) ?? month.date
+        
+        while renewalDate < startOfTargetMonth {
+            guard let advanced = calendar.date(byAdding: .month, value: stepMonths, to: renewalDate) else { break }
+            renewalDate = advanced
+        }
+        
+        return dateFormatter.string(from: renewalDate)
+    }
+    
+    private func formattedAmount(_ value: Double) -> String {
+        let formatter = NumberFormatter()
+        formatter.numberStyle = .currency
+        formatter.currencyCode = currencyCode
+        return formatter.string(from: value as NSNumber) ?? "\(value)"
     }
 }

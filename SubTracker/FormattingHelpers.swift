@@ -27,5 +27,8 @@ extension Double {
 }
 
 extension String {
-    var doubleValue: Double? { Double(self) }
+    var doubleValue: Double? {
+        // Virgülü noktaya çevirerek parse et
+        Double(self.replacingOccurrences(of: ",", with: "."))
+    }
 }

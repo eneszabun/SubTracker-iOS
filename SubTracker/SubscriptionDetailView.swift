@@ -56,6 +56,7 @@ struct SubscriptionDetailView: View {
                 formSection
                 reminderCard
                 endDateSection
+                paymentHistorySection
                 actionButtons
             }
             .padding(.horizontal, 16)
@@ -310,6 +311,90 @@ struct SubscriptionDetailView: View {
         }
     }
 
+    @ViewBuilder
+    private var paymentHistorySection: some View {
+        let payments = subscription.paymentHistory
+        
+        if !payments.isEmpty {
+            VStack(alignment: .leading, spacing: 16) {
+                // Başlık ve özet
+                HStack(spacing: 12) {
+                    ZStack {
+                        Circle()
+                            .fill(palette.primary.opacity(0.18))
+                            .frame(width: 40, height: 40)
+                        Image(systemName: "clock.arrow.circlepath")
+                            .font(.system(size: 16, weight: .semibold))
+                            .foregroundStyle(palette.primary)
+                    }
+                    
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("Ödeme Geçmişi")
+                            .font(.system(size: 15, weight: .semibold))
+                            .foregroundStyle(palette.textPrimary)
+                        Text("\(payments.count) ödeme • Toplam \(subscription.formattedTotalSpent)")
+                            .font(.system(size: 12, weight: .medium))
+                            .foregroundStyle(palette.textSecondary)
+                    }
+                    
+                    Spacer()
+                }
+                .padding(14)
+                .background(palette.inputBackground, in: RoundedRectangle(cornerRadius: 16, style: .continuous))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 16, style: .continuous)
+                        .stroke(palette.inputBorder, lineWidth: 1)
+                )
+                
+                // Ödeme listesi (son 6 ödeme)
+                VStack(spacing: 0) {
+                    let displayPayments = Array(payments.prefix(6))
+                    ForEach(Array(displayPayments.enumerated()), id: \.element.id) { index, payment in
+                        PaymentHistoryRow(
+                            payment: payment,
+                            isFirst: index == 0,
+                            isLast: index == displayPayments.count - 1,
+                            palette: palette
+                        )
+                        
+                        if index < displayPayments.count - 1 {
+                            Divider()
+                                .background(palette.inputBorder)
+                                .padding(.leading, 48)
+                        }
+                    }
+                    
+                    // Daha fazla ödeme varsa göster
+                    if payments.count > 6 {
+                        Divider()
+                            .background(palette.inputBorder)
+                            .padding(.leading, 48)
+                        
+                        HStack(spacing: 8) {
+                            Image(systemName: "ellipsis")
+                                .font(.system(size: 14, weight: .medium))
+                                .foregroundStyle(palette.textSecondary)
+                                .frame(width: 32, height: 32)
+                            
+                            Text("ve \(payments.count - 6) ödeme daha")
+                                .font(.system(size: 14, weight: .medium))
+                                .foregroundStyle(palette.textSecondary)
+                            
+                            Spacer()
+                        }
+                        .padding(.horizontal, 14)
+                        .padding(.vertical, 12)
+                    }
+                }
+                .background(palette.inputBackground, in: RoundedRectangle(cornerRadius: 16, style: .continuous))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 16, style: .continuous)
+                        .stroke(palette.inputBorder, lineWidth: 1)
+                )
+            }
+        }
+    }
+    
     private var actionButtons: some View {
         VStack(spacing: 12) {
             Button {
@@ -479,5 +564,50 @@ private struct DatePickerSheet: View {
                 }
             }
         }
+    }
+}
+
+private struct PaymentHistoryRow: View {
+    let payment: PaymentRecord
+    let isFirst: Bool
+    let isLast: Bool
+    let palette: SubscriptionDetailPalette
+    
+    var body: some View {
+        HStack(spacing: 12) {
+            // Timeline nokta
+            ZStack {
+                Circle()
+                    .fill(isFirst ? palette.primary : palette.primary.opacity(0.3))
+                    .frame(width: isFirst ? 10 : 8, height: isFirst ? 10 : 8)
+                
+                if isFirst {
+                    Circle()
+                        .stroke(palette.primary.opacity(0.3), lineWidth: 3)
+                        .frame(width: 18, height: 18)
+                }
+            }
+            .frame(width: 32, height: 32)
+            
+            // Tarih bilgisi
+            VStack(alignment: .leading, spacing: 2) {
+                Text(payment.formattedDate)
+                    .font(.system(size: 14, weight: isFirst ? .semibold : .medium))
+                    .foregroundStyle(isFirst ? palette.textPrimary : palette.textSecondary)
+                
+                Text(payment.relativeTimeText)
+                    .font(.system(size: 12, weight: .regular))
+                    .foregroundStyle(palette.textSecondary.opacity(0.8))
+            }
+            
+            Spacer()
+            
+            // Tutar
+            Text(payment.formattedAmount)
+                .font(.system(size: 14, weight: isFirst ? .bold : .medium))
+                .foregroundStyle(isFirst ? palette.primary : palette.textSecondary)
+        }
+        .padding(.horizontal, 14)
+        .padding(.vertical, 12)
     }
 }

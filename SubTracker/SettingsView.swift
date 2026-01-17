@@ -2,13 +2,19 @@ import SwiftUI
 
 struct SettingsView: View {
     @ObservedObject var auth: AuthViewModel
+    @StateObject private var proManager = ProManager.shared
     @AppStorage("defaultCurrency") private var defaultCurrency = "USD"
     @AppStorage("reminderDays") private var reminderDays: Int = 3
     @AppStorage("colorSchemePreference") private var colorSchemePreference: String = "system"
+    @AppStorage("monthlyBudgetEnabled") private var monthlyBudgetEnabled = false
+    @AppStorage("monthlyBudgetAmount") private var monthlyBudgetAmount: Double = 0
+    @AppStorage("iCloudSyncEnabled") private var iCloudSyncEnabled = false
     @Environment(\.colorScheme) private var colorScheme
     @Environment(\.dismiss) private var dismiss
     @State private var showingNameEditor = false
     @State private var editingName = ""
+    @State private var showingBudgetEditor = false
+    @State private var showingProUpgrade = false
 
     private let currencies = ["USD", "EUR", "GBP", "TRY"]
 
@@ -22,12 +28,17 @@ struct SettingsView: View {
                 VStack(spacing: 24) {
                     profileSection
                     appearanceSection
+                    budgetSection
+                    syncSection
                     notificationSection
                     signOutSection
                 }
                 .padding(.horizontal, 16)
                 .padding(.top, 12)
                 .padding(.bottom, 32)
+            }
+            .sheet(isPresented: $showingProUpgrade) {
+                ProUpgradeSheet(proManager: proManager)
             }
             .scrollIndicators(.hidden)
             .background(palette.background)
@@ -124,9 +135,25 @@ struct SettingsView: View {
             }
             .buttonStyle(.plain)
 
-            Text("Pro Hesap")
-                .font(.system(size: 14, weight: .medium))
-                .foregroundStyle(palette.textSecondary)
+            if proManager.canAccessProFeatures {
+                ProBadge()
+            } else {
+                Button {
+                    showingProUpgrade = true
+                } label: {
+                    HStack(spacing: 6) {
+                        Image(systemName: "crown")
+                            .font(.system(size: 12, weight: .semibold))
+                        Text("Pro'ya Yükselt")
+                            .font(.system(size: 13, weight: .semibold))
+                    }
+                    .foregroundStyle(palette.primary)
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 6)
+                    .background(palette.primary.opacity(0.1), in: Capsule())
+                }
+                .buttonStyle(.plain)
+            }
         }
         .frame(maxWidth: .infinity)
         .sheet(isPresented: $showingNameEditor) {
@@ -176,6 +203,146 @@ struct SettingsView: View {
                 }
                 .buttonStyle(.plain)
             }
+        }
+    }
+
+    private var budgetSection: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            sectionHeader("Bütçe Yönetimi")
+
+            SettingsCard(palette: palette) {
+                // Bütçe açma/kapama toggle
+                HStack(spacing: 12) {
+                    ZStack {
+                        RoundedRectangle(cornerRadius: 12, style: .continuous)
+                            .fill(palette.iconBudgetBackground)
+                            .frame(width: 40, height: 40)
+                        Image(systemName: "chart.pie.fill")
+                            .font(.system(size: 18, weight: .semibold))
+                            .foregroundStyle(palette.iconBudget)
+                    }
+
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("Aylık Bütçe")
+                            .font(.system(size: 16, weight: .semibold))
+                            .foregroundStyle(palette.textPrimary)
+                        Text(monthlyBudgetEnabled ? "Aktif" : "Kapalı")
+                            .font(.system(size: 12, weight: .medium))
+                            .foregroundStyle(palette.textSecondary)
+                    }
+
+                    Spacer()
+
+                    Toggle("", isOn: $monthlyBudgetEnabled)
+                        .labelsHidden()
+                        .toggleStyle(SwitchToggleStyle(tint: palette.primary))
+                }
+                .padding(.horizontal, 16)
+                .padding(.vertical, 14)
+
+                if monthlyBudgetEnabled {
+                    SettingsDivider(palette: palette)
+
+                    Button {
+                        showingBudgetEditor = true
+                    } label: {
+                        SettingsRow(
+                            palette: palette,
+                            icon: "turkishlirasign.circle.fill",
+                            iconBackground: palette.iconCurrencyBackground,
+                            iconColor: palette.iconCurrency,
+                            title: "Limit Belirle",
+                            value: budgetDisplayValue
+                        )
+                    }
+                    .buttonStyle(.plain)
+                }
+            }
+
+            if monthlyBudgetEnabled {
+                Text("Aylık abonelik harcamalarınız belirlediğiniz limiti aştığında uyarı alırsınız.")
+                    .font(.system(size: 11, weight: .medium))
+                    .foregroundStyle(palette.textSecondary)
+                    .padding(.horizontal, 12)
+            }
+        }
+        .sheet(isPresented: $showingBudgetEditor) {
+            BudgetEditorSheet(
+                amount: $monthlyBudgetAmount,
+                currencyCode: defaultCurrency,
+                palette: palette
+            )
+            .presentationDetents([.height(280)])
+        }
+    }
+
+    private var budgetDisplayValue: String {
+        if monthlyBudgetAmount <= 0 {
+            return "Ayarlanmadı"
+        }
+        let formatter = NumberFormatter()
+        formatter.numberStyle = .currency
+        formatter.currencyCode = defaultCurrency
+        return formatter.string(from: monthlyBudgetAmount as NSNumber) ?? "\(monthlyBudgetAmount)"
+    }
+
+    private var syncSection: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            HStack {
+                sectionHeader("Senkronizasyon")
+                Spacer()
+                if !proManager.canAccessProFeatures {
+                    ProBadge()
+                }
+            }
+
+            SettingsCard(palette: palette) {
+                HStack(spacing: 12) {
+                    ZStack {
+                        RoundedRectangle(cornerRadius: 12, style: .continuous)
+                            .fill(palette.iconSyncBackground)
+                            .frame(width: 40, height: 40)
+                        Image(systemName: "icloud.fill")
+                            .font(.system(size: 18, weight: .semibold))
+                            .foregroundStyle(palette.iconSync)
+                    }
+
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("iCloud Senkronu")
+                            .font(.system(size: 16, weight: .semibold))
+                            .foregroundStyle(palette.textPrimary)
+                        Text(iCloudSyncEnabled ? "Aktif" : "Kapalı")
+                            .font(.system(size: 12, weight: .medium))
+                            .foregroundStyle(palette.textSecondary)
+                    }
+
+                    Spacer()
+
+                    if proManager.canAccessProFeatures {
+                        Toggle("", isOn: $iCloudSyncEnabled)
+                            .labelsHidden()
+                            .toggleStyle(SwitchToggleStyle(tint: palette.primary))
+                    } else {
+                        Button {
+                            showingProUpgrade = true
+                        } label: {
+                            Image(systemName: "lock.fill")
+                                .font(.system(size: 14, weight: .semibold))
+                                .foregroundStyle(palette.textSecondary)
+                        }
+                        .buttonStyle(.plain)
+                    }
+                }
+                .padding(.horizontal, 16)
+                .padding(.vertical, 14)
+            }
+
+            Text(proManager.canAccessProFeatures 
+                 ? "Aboneliklerinizi tüm Apple cihazlarınızda senkronize edin."
+                 : "iCloud senkronu Pro abonelik gerektiren bir özelliktir.")
+                .font(.system(size: 11, weight: .medium))
+                .foregroundStyle(palette.textSecondary)
+                .padding(.horizontal, 12)
         }
     }
 
@@ -559,6 +726,12 @@ private struct SettingsPalette {
     var iconCurrency: Color { scheme == .dark ? Color(red: 0.35, green: 0.9, blue: 0.7) : Color(red: 0.2, green: 0.65, blue: 0.45) }
     var iconNotificationBackground: Color { scheme == .dark ? Color(red: 0.5, green: 0.35, blue: 0.1).opacity(0.3) : Color(red: 1.0, green: 0.95, blue: 0.85) }
     var iconNotification: Color { scheme == .dark ? Color(red: 0.95, green: 0.7, blue: 0.35) : Color(red: 0.8, green: 0.55, blue: 0.1) }
+    
+    var iconBudgetBackground: Color { scheme == .dark ? Color(red: 0.45, green: 0.2, blue: 0.5).opacity(0.3) : Color(red: 0.98, green: 0.92, blue: 1.0) }
+    var iconBudget: Color { scheme == .dark ? Color(red: 0.8, green: 0.5, blue: 0.9) : Color(red: 0.6, green: 0.3, blue: 0.75) }
+    
+    var iconSyncBackground: Color { scheme == .dark ? Color(red: 0.15, green: 0.35, blue: 0.55).opacity(0.4) : Color(red: 0.9, green: 0.95, blue: 1.0) }
+    var iconSync: Color { scheme == .dark ? Color(red: 0.4, green: 0.7, blue: 1.0) : Color(red: 0.2, green: 0.5, blue: 0.9) }
 
     var destructive: Color { scheme == .dark ? Color(red: 0.95, green: 0.4, blue: 0.4) : Color(red: 0.86, green: 0.2, blue: 0.2) }
     var destructiveBorder: Color { scheme == .dark ? Color(red: 0.55, green: 0.18, blue: 0.18).opacity(0.4) : Color(red: 0.95, green: 0.85, blue: 0.85) }
@@ -618,5 +791,381 @@ private struct NameEditorSheet: View {
                 isFocused = true
             }
         }
+    }
+}
+
+private struct BudgetEditorSheet: View {
+    @Binding var amount: Double
+    let currencyCode: String
+    let palette: SettingsPalette
+    
+    @Environment(\.dismiss) private var dismiss
+    @FocusState private var isFocused: Bool
+    @State private var amountText: String = ""
+    
+    private var currencySymbol: String {
+        let formatter = NumberFormatter()
+        formatter.numberStyle = .currency
+        formatter.currencyCode = currencyCode
+        return formatter.currencySymbol ?? currencyCode
+    }
+    
+    var body: some View {
+        NavigationStack {
+            VStack(spacing: 24) {
+                VStack(spacing: 8) {
+                    Text("Aylık bütçe limitinizi belirleyin")
+                        .font(.system(size: 14, weight: .medium))
+                        .foregroundStyle(palette.textSecondary)
+                        .multilineTextAlignment(.center)
+                    
+                    HStack(alignment: .center, spacing: 4) {
+                        Text(currencySymbol)
+                            .font(.system(size: 28, weight: .bold))
+                            .foregroundStyle(palette.textSecondary)
+                        
+                        TextField("0", text: $amountText)
+                            .font(.system(size: 48, weight: .black))
+                            .foregroundStyle(palette.textPrimary)
+                            .keyboardType(.decimalPad)
+                            .multilineTextAlignment(.center)
+                            .focused($isFocused)
+                            .onChange(of: amountText, initial: false) { _, newValue in
+                                amountText = sanitizeBudgetInput(newValue)
+                            }
+                    }
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 16)
+                }
+                
+                // Hızlı seçim butonları
+                HStack(spacing: 12) {
+                    ForEach(quickAmounts, id: \.self) { quickAmount in
+                        Button {
+                            amountText = String(format: "%.0f", quickAmount)
+                        } label: {
+                            Text(formattedQuickAmount(quickAmount))
+                                .font(.system(size: 13, weight: .semibold))
+                                .foregroundStyle(palette.primary)
+                                .padding(.horizontal, 16)
+                                .padding(.vertical, 10)
+                                .background(palette.primary.opacity(0.1), in: Capsule())
+                        }
+                        .buttonStyle(.plain)
+                    }
+                }
+                
+                Spacer()
+            }
+            .padding(.horizontal, 20)
+            .padding(.top, 24)
+            .background(palette.background)
+            .navigationTitle("Bütçe Limiti")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("İptal") {
+                        dismiss()
+                    }
+                }
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("Kaydet") {
+                        if let value = normalizedAmount {
+                            amount = value
+                        }
+                        dismiss()
+                    }
+                    .fontWeight(.semibold)
+                    .disabled(normalizedAmount == nil || normalizedAmount! <= 0)
+                }
+            }
+            .onAppear {
+                if amount > 0 {
+                    amountText = String(format: "%.0f", amount)
+                }
+                isFocused = true
+            }
+        }
+    }
+    
+    private var normalizedAmount: Double? {
+        amountText.replacingOccurrences(of: ",", with: ".").doubleValue
+    }
+    
+    private var quickAmounts: [Double] {
+        switch currencyCode {
+        case "TRY": return [500, 1000, 2500, 5000]
+        case "EUR", "GBP": return [50, 100, 200, 500]
+        default: return [50, 100, 250, 500]
+        }
+    }
+    
+    private func formattedQuickAmount(_ value: Double) -> String {
+        let formatter = NumberFormatter()
+        formatter.numberStyle = .currency
+        formatter.currencyCode = currencyCode
+        formatter.maximumFractionDigits = 0
+        return formatter.string(from: value as NSNumber) ?? "\(Int(value))"
+    }
+    
+    private func sanitizeBudgetInput(_ input: String) -> String {
+        var result = input.filter { $0.isNumber || $0 == "," || $0 == "." }
+        let separators = result.filter { $0 == "," || $0 == "." }
+        if separators.count > 1 {
+            var foundFirst = false
+            result = String(result.compactMap { char in
+                if char == "," || char == "." {
+                    if foundFirst { return nil }
+                    foundFirst = true
+                }
+                return char
+            })
+        }
+        return result
+    }
+}
+
+// MARK: - Pro Upgrade Sheet
+
+private struct ProUpgradeSheet: View {
+    @ObservedObject var proManager: ProManager
+    @Environment(\.dismiss) private var dismiss
+    @Environment(\.colorScheme) private var colorScheme
+    
+    private var palette: SettingsPalette {
+        SettingsPalette(scheme: colorScheme)
+    }
+    
+    var body: some View {
+        NavigationStack {
+            ScrollView {
+                VStack(spacing: 28) {
+                    // Hero Section
+                    VStack(spacing: 16) {
+                        ZStack {
+                            Circle()
+                                .fill(
+                                    LinearGradient(
+                                        colors: [Color(red: 1.0, green: 0.6, blue: 0.2), Color(red: 0.95, green: 0.4, blue: 0.3)],
+                                        startPoint: .topLeading,
+                                        endPoint: .bottomTrailing
+                                    )
+                                )
+                                .frame(width: 100, height: 100)
+                                .shadow(color: Color(red: 1.0, green: 0.5, blue: 0.25).opacity(0.4), radius: 20, x: 0, y: 10)
+                            
+                            Image(systemName: "crown.fill")
+                                .font(.system(size: 44, weight: .bold))
+                                .foregroundStyle(.white)
+                        }
+                        
+                        VStack(spacing: 8) {
+                            Text("SubTracker Pro")
+                                .font(.system(size: 28, weight: .black))
+                                .foregroundStyle(palette.textPrimary)
+                            
+                            Text("Tüm özelliklerin kilidini açın")
+                                .font(.system(size: 15, weight: .medium))
+                                .foregroundStyle(palette.textSecondary)
+                        }
+                    }
+                    .padding(.top, 20)
+                    
+                    // Features List
+                    VStack(spacing: 12) {
+                        ForEach(ProManager.proFeatures) { feature in
+                            ProFeatureRow(feature: feature, palette: palette)
+                        }
+                    }
+                    
+                    // Pricing Section
+                    VStack(spacing: 16) {
+                        // Aylık Plan
+                        ProPlanCard(
+                            title: "Aylık",
+                            price: "₺49,99",
+                            period: "/ay",
+                            isPopular: false,
+                            palette: palette
+                        ) {
+                            // TODO: StoreKit satın alma
+                            proManager.activatePro()
+                            dismiss()
+                        }
+                        
+                        // Yıllık Plan
+                        ProPlanCard(
+                            title: "Yıllık",
+                            price: "₺399,99",
+                            period: "/yıl",
+                            savings: "2 ay ücretsiz",
+                            isPopular: true,
+                            palette: palette
+                        ) {
+                            // TODO: StoreKit satın alma
+                            proManager.activatePro()
+                            dismiss()
+                        }
+                    }
+                    
+                    // Trial Button
+                    if !proManager.canAccessProFeatures && proManager.trialEndDate == nil {
+                        Button {
+                            proManager.startTrial()
+                            dismiss()
+                        } label: {
+                            Text("7 Gün Ücretsiz Dene")
+                                .font(.system(size: 15, weight: .semibold))
+                                .foregroundStyle(palette.primary)
+                        }
+                        .padding(.top, 4)
+                    }
+                    
+                    // Terms
+                    Text("Satın alma işlemi Apple Kimliğinize faturalandırılır. Abonelik, mevcut dönem sona ermeden en az 24 saat önce iptal edilmediği sürece otomatik olarak yenilenir.")
+                        .font(.system(size: 10, weight: .medium))
+                        .foregroundStyle(palette.textSecondary.opacity(0.7))
+                        .multilineTextAlignment(.center)
+                        .padding(.horizontal, 20)
+                }
+                .padding(.horizontal, 20)
+                .padding(.bottom, 32)
+            }
+            .scrollIndicators(.hidden)
+            .background(palette.background)
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button {
+                        dismiss()
+                    } label: {
+                        Image(systemName: "xmark")
+                            .font(.system(size: 14, weight: .semibold))
+                            .foregroundStyle(palette.textSecondary)
+                            .frame(width: 32, height: 32)
+                            .background(palette.surface, in: Circle())
+                    }
+                }
+            }
+        }
+    }
+}
+
+private struct ProFeatureRow: View {
+    let feature: ProFeature
+    let palette: SettingsPalette
+    
+    var body: some View {
+        HStack(spacing: 14) {
+            ZStack {
+                RoundedRectangle(cornerRadius: 12, style: .continuous)
+                    .fill(
+                        LinearGradient(
+                            colors: [Color(red: 1.0, green: 0.6, blue: 0.2).opacity(0.15), Color(red: 0.95, green: 0.4, blue: 0.3).opacity(0.15)],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        )
+                    )
+                    .frame(width: 44, height: 44)
+                
+                Image(systemName: feature.icon)
+                    .font(.system(size: 18, weight: .semibold))
+                    .foregroundStyle(Color(red: 0.95, green: 0.5, blue: 0.25))
+            }
+            
+            VStack(alignment: .leading, spacing: 2) {
+                Text(feature.title)
+                    .font(.system(size: 15, weight: .bold))
+                    .foregroundStyle(palette.textPrimary)
+                
+                Text(feature.description)
+                    .font(.system(size: 12, weight: .medium))
+                    .foregroundStyle(palette.textSecondary)
+            }
+            
+            Spacer()
+        }
+        .padding(14)
+        .background(palette.surface, in: RoundedRectangle(cornerRadius: 16, style: .continuous))
+        .overlay(
+            RoundedRectangle(cornerRadius: 16, style: .continuous)
+                .stroke(palette.cardBorder, lineWidth: 1)
+        )
+    }
+}
+
+private struct ProPlanCard: View {
+    let title: String
+    let price: String
+    let period: String
+    var savings: String? = nil
+    let isPopular: Bool
+    let palette: SettingsPalette
+    let action: () -> Void
+    
+    var body: some View {
+        Button(action: action) {
+            VStack(spacing: 12) {
+                if isPopular {
+                    Text("EN POPÜLER")
+                        .font(.system(size: 10, weight: .black))
+                        .foregroundStyle(.white)
+                        .tracking(0.5)
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 4)
+                        .background(
+                            LinearGradient(
+                                colors: [Color(red: 1.0, green: 0.6, blue: 0.2), Color(red: 0.95, green: 0.4, blue: 0.3)],
+                                startPoint: .leading,
+                                endPoint: .trailing
+                            ),
+                            in: Capsule()
+                        )
+                }
+                
+                HStack {
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text(title)
+                            .font(.system(size: 16, weight: .bold))
+                            .foregroundStyle(palette.textPrimary)
+                        
+                        if let savings = savings {
+                            Text(savings)
+                                .font(.system(size: 12, weight: .semibold))
+                                .foregroundStyle(Color(red: 0.2, green: 0.7, blue: 0.4))
+                        }
+                    }
+                    
+                    Spacer()
+                    
+                    HStack(alignment: .lastTextBaseline, spacing: 2) {
+                        Text(price)
+                            .font(.system(size: 24, weight: .black))
+                            .foregroundStyle(palette.textPrimary)
+                        
+                        Text(period)
+                            .font(.system(size: 12, weight: .medium))
+                            .foregroundStyle(palette.textSecondary)
+                    }
+                }
+            }
+            .padding(16)
+            .background(palette.surface, in: RoundedRectangle(cornerRadius: 18, style: .continuous))
+            .overlay(
+                RoundedRectangle(cornerRadius: 18, style: .continuous)
+                    .stroke(
+                        isPopular 
+                            ? LinearGradient(
+                                colors: [Color(red: 1.0, green: 0.6, blue: 0.2), Color(red: 0.95, green: 0.4, blue: 0.3)],
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            )
+                            : LinearGradient(colors: [palette.cardBorder], startPoint: .top, endPoint: .bottom),
+                        lineWidth: isPopular ? 2 : 1
+                    )
+            )
+            .shadow(color: isPopular ? Color(red: 1.0, green: 0.5, blue: 0.25).opacity(0.2) : palette.cardShadow, radius: isPopular ? 12 : 6, x: 0, y: isPopular ? 6 : 2)
+        }
+        .buttonStyle(.plain)
     }
 }

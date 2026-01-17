@@ -5,6 +5,8 @@ struct SummaryView: View {
     @Binding var selectedTab: AppTab
     @AppStorage("defaultCurrency") private var defaultCurrency = "USD"
     @AppStorage("reminderDays") private var reminderDays: Int = 3
+    @AppStorage("monthlyBudgetEnabled") private var monthlyBudgetEnabled = false
+    @AppStorage("monthlyBudgetAmount") private var monthlyBudgetAmount: Double = 0
     @Environment(\.colorScheme) private var colorScheme
     @State private var selectedPeriod: SummaryPeriod = .yearly
     @State private var isPresentingAdd = false
@@ -55,6 +57,9 @@ struct SummaryView: View {
             VStack(spacing: 18) {
                 periodToggle
                 totalExpenseCard
+                if monthlyBudgetEnabled && monthlyBudgetAmount > 0 {
+                    budgetStatusCard
+                }
                 statsGrid
                 upcomingLightSection
                 highestCostSection
@@ -90,6 +95,9 @@ struct SummaryView: View {
             VStack(spacing: 18) {
                 darkPeriodToggle
                 darkTotalExpenseCard
+                if monthlyBudgetEnabled && monthlyBudgetAmount > 0 {
+                    darkBudgetStatusCard
+                }
                 darkStatsGrid
                 darkUpcomingSection
                 darkHighestCostSection
@@ -221,7 +229,7 @@ struct SummaryView: View {
         let title = selectedPeriod == .yearly ? "Toplam Yıllık Gider" : "Toplam Aylık Gider"
 
         return NavigationLink {
-            YearlyBreakdownView(breakdown: monthlyBreakdown, currencyCode: defaultCurrency, yearlyTotal: subscriptions.yearlyTotal)
+            YearlyBreakdownView(breakdown: monthlyBreakdown, currencyCode: defaultCurrency, yearlyTotal: subscriptions.yearlyTotal, subscriptions: subscriptions)
         } label: {
             VStack(alignment: .leading, spacing: 16) {
                 VStack(alignment: .leading, spacing: 6) {
@@ -269,7 +277,7 @@ struct SummaryView: View {
         let title = selectedPeriod == .yearly ? "Toplam Yıllık Gider" : "Toplam Aylık Gider"
 
         return NavigationLink {
-            YearlyBreakdownView(breakdown: monthlyBreakdown, currencyCode: defaultCurrency, yearlyTotal: subscriptions.yearlyTotal)
+            YearlyBreakdownView(breakdown: monthlyBreakdown, currencyCode: defaultCurrency, yearlyTotal: subscriptions.yearlyTotal, subscriptions: subscriptions)
         } label: {
             VStack(alignment: .leading, spacing: 16) {
                 VStack(alignment: .leading, spacing: 6) {
@@ -309,6 +317,163 @@ struct SummaryView: View {
             )
         }
         .buttonStyle(.plain)
+    }
+
+    // MARK: - Budget Status Cards
+    
+    /// Tüm aboneliklerin varsayılan para birimine çevrilmiş aylık toplamı
+    private var convertedMonthlyTotal: Double {
+        subscriptions.convertedMonthlyTotal(to: defaultCurrency)
+    }
+    
+    private var budgetUsagePercent: Double {
+        guard monthlyBudgetAmount > 0 else { return 0 }
+        return min(convertedMonthlyTotal / monthlyBudgetAmount, 1.5)
+    }
+    
+    private var budgetRemaining: Double {
+        max(0, monthlyBudgetAmount - convertedMonthlyTotal)
+    }
+    
+    private var isOverBudget: Bool {
+        convertedMonthlyTotal > monthlyBudgetAmount
+    }
+    
+    private var budgetStatusCard: some View {
+        VStack(spacing: 14) {
+            HStack(spacing: 12) {
+                ZStack {
+                    Circle()
+                        .fill(isOverBudget ? SummaryLightPalette.negative.opacity(0.12) : SummaryLightPalette.positive.opacity(0.12))
+                        .frame(width: 40, height: 40)
+                    Image(systemName: isOverBudget ? "exclamationmark.triangle.fill" : "checkmark.circle.fill")
+                        .font(.system(size: 18, weight: .semibold))
+                        .foregroundStyle(isOverBudget ? SummaryLightPalette.negative : SummaryLightPalette.positive)
+                }
+                
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(isOverBudget ? "Bütçe Aşıldı!" : "Bütçe Durumu")
+                        .font(.system(size: 14, weight: .bold))
+                        .foregroundStyle(SummaryLightPalette.textPrimary)
+                    Text(isOverBudget ? "Limitin \(formattedAmount(convertedMonthlyTotal - monthlyBudgetAmount)) üzerinde" : "\(formattedAmount(budgetRemaining)) kaldı")
+                        .font(.system(size: 12, weight: .medium))
+                        .foregroundStyle(SummaryLightPalette.textMuted)
+                }
+                
+                Spacer()
+                
+                Text(String(format: "%.0f%%", min(budgetUsagePercent * 100, 150)))
+                    .font(.system(size: 20, weight: .black))
+                    .foregroundStyle(isOverBudget ? SummaryLightPalette.negative : SummaryLightPalette.primary)
+            }
+            
+            // Progress bar
+            GeometryReader { proxy in
+                ZStack(alignment: .leading) {
+                    RoundedRectangle(cornerRadius: 6, style: .continuous)
+                        .fill(SummaryLightPalette.chartBase)
+                        .frame(height: 10)
+                    
+                    RoundedRectangle(cornerRadius: 6, style: .continuous)
+                        .fill(
+                            LinearGradient(
+                                colors: isOverBudget 
+                                    ? [SummaryLightPalette.negative.opacity(0.8), SummaryLightPalette.negative]
+                                    : [SummaryLightPalette.positive.opacity(0.8), SummaryLightPalette.positive],
+                                startPoint: .leading,
+                                endPoint: .trailing
+                            )
+                        )
+                        .frame(width: min(budgetUsagePercent, 1.0) * proxy.size.width, height: 10)
+                }
+            }
+            .frame(height: 10)
+            
+            HStack {
+                Text("\(formattedAmount(convertedMonthlyTotal))")
+                    .font(.system(size: 11, weight: .semibold))
+                    .foregroundStyle(SummaryLightPalette.textMuted)
+                Spacer()
+                Text("/ \(formattedAmount(monthlyBudgetAmount))")
+                    .font(.system(size: 11, weight: .semibold))
+                    .foregroundStyle(SummaryLightPalette.textMuted)
+            }
+        }
+        .padding(16)
+        .background(SummaryLightPalette.surface, in: RoundedRectangle(cornerRadius: 20, style: .continuous))
+        .overlay(
+            RoundedRectangle(cornerRadius: 20, style: .continuous)
+                .stroke(isOverBudget ? SummaryLightPalette.negative.opacity(0.3) : SummaryLightPalette.border, lineWidth: 1)
+        )
+        .shadow(color: SummaryLightPalette.shadow, radius: 8, x: 0, y: 2)
+    }
+    
+    private var darkBudgetStatusCard: some View {
+        VStack(spacing: 14) {
+            HStack(spacing: 12) {
+                ZStack {
+                    Circle()
+                        .fill(isOverBudget ? SummaryDarkPalette.negative.opacity(0.2) : SummaryDarkPalette.positive.opacity(0.2))
+                        .frame(width: 40, height: 40)
+                    Image(systemName: isOverBudget ? "exclamationmark.triangle.fill" : "checkmark.circle.fill")
+                        .font(.system(size: 18, weight: .semibold))
+                        .foregroundStyle(isOverBudget ? SummaryDarkPalette.negative : SummaryDarkPalette.positive)
+                }
+                
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(isOverBudget ? "Bütçe Aşıldı!" : "Bütçe Durumu")
+                        .font(.system(size: 14, weight: .bold))
+                        .foregroundStyle(SummaryDarkPalette.textPrimary)
+                    Text(isOverBudget ? "Limitin \(formattedAmount(convertedMonthlyTotal - monthlyBudgetAmount)) üzerinde" : "\(formattedAmount(budgetRemaining)) kaldı")
+                        .font(.system(size: 12, weight: .medium))
+                        .foregroundStyle(SummaryDarkPalette.textMuted)
+                }
+                
+                Spacer()
+                
+                Text(String(format: "%.0f%%", min(budgetUsagePercent * 100, 150)))
+                    .font(.system(size: 20, weight: .black))
+                    .foregroundStyle(isOverBudget ? SummaryDarkPalette.negative : SummaryDarkPalette.primary)
+            }
+            
+            // Progress bar
+            GeometryReader { proxy in
+                ZStack(alignment: .leading) {
+                    RoundedRectangle(cornerRadius: 6, style: .continuous)
+                        .fill(SummaryDarkPalette.chartEmpty)
+                        .frame(height: 10)
+                    
+                    RoundedRectangle(cornerRadius: 6, style: .continuous)
+                        .fill(
+                            LinearGradient(
+                                colors: isOverBudget 
+                                    ? [SummaryDarkPalette.negative.opacity(0.8), SummaryDarkPalette.negative]
+                                    : [SummaryDarkPalette.positive.opacity(0.8), SummaryDarkPalette.positive],
+                                startPoint: .leading,
+                                endPoint: .trailing
+                            )
+                        )
+                        .frame(width: min(budgetUsagePercent, 1.0) * proxy.size.width, height: 10)
+                }
+            }
+            .frame(height: 10)
+            
+            HStack {
+                Text("\(formattedAmount(convertedMonthlyTotal))")
+                    .font(.system(size: 11, weight: .semibold))
+                    .foregroundStyle(SummaryDarkPalette.textMuted)
+                Spacer()
+                Text("/ \(formattedAmount(monthlyBudgetAmount))")
+                    .font(.system(size: 11, weight: .semibold))
+                    .foregroundStyle(SummaryDarkPalette.textMuted)
+            }
+        }
+        .padding(16)
+        .background(SummaryDarkPalette.surface, in: RoundedRectangle(cornerRadius: 18, style: .continuous))
+        .overlay(
+            RoundedRectangle(cornerRadius: 18, style: .continuous)
+                .stroke(isOverBudget ? SummaryDarkPalette.negative.opacity(0.3) : SummaryDarkPalette.border, lineWidth: 1)
+        )
     }
 
     private var statsGrid: some View {
@@ -575,7 +740,7 @@ struct SummaryView: View {
         return HStack(spacing: 12) {
             SummaryCard(title: "Aylık", value: formatter.string(from: monthly as NSNumber) ?? "-", color: .blue)
             NavigationLink {
-                YearlyBreakdownView(breakdown: monthlyBreakdown, currencyCode: defaultCurrency, yearlyTotal: yearly)
+                YearlyBreakdownView(breakdown: monthlyBreakdown, currencyCode: defaultCurrency, yearlyTotal: yearly, subscriptions: subscriptions)
             } label: {
                 SummaryCard(title: "Yıllık", value: formatter.string(from: yearly as NSNumber) ?? "-", color: .purple)
             }

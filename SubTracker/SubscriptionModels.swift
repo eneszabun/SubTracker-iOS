@@ -111,6 +111,67 @@ struct Subscription: Identifiable, Codable, Equatable {
         
         return renewalDate
     }
+    
+    /// Aboneliğin geçmiş ödeme kayıtlarını hesaplar (başlangıçtan bugüne kadar)
+    var paymentHistory: [PaymentRecord] {
+        let calendar = Calendar.current
+        let now = Date()
+        let today = calendar.startOfDay(for: now)
+        let startDay = calendar.startOfDay(for: nextRenewal)
+        
+        // Başlangıç tarihi gelecekteyse, henüz ödeme yapılmamış
+        if startDay > today {
+            return []
+        }
+        
+        var payments: [PaymentRecord] = []
+        let stepMonths = cycle == .monthly ? 1 : 12
+        var currentDate = nextRenewal
+        
+        // Başlangıçtan bugüne kadar tüm ödeme dönemlerini hesapla
+        while calendar.startOfDay(for: currentDate) <= today {
+            // Bitiş tarihi kontrolü
+            if let end = endDate, currentDate > end {
+                break
+            }
+            
+            payments.append(PaymentRecord(
+                date: currentDate,
+                amount: amount,
+                currency: currency
+            ))
+            
+            guard let advanced = calendar.date(byAdding: .month, value: stepMonths, to: currentDate) else {
+                break
+            }
+            currentDate = advanced
+            
+            // Makul bir limit (10 yıl) - sonsuz döngüyü önlemek için
+            if payments.count >= 120 {
+                break
+            }
+        }
+        
+        // En yeni ödemeler en üstte olsun
+        return payments.reversed()
+    }
+    
+    /// Toplam yapılan ödeme sayısı
+    var totalPaymentCount: Int {
+        paymentHistory.count
+    }
+    
+    /// Toplam harcanan tutar
+    var totalSpent: Double {
+        Double(paymentHistory.count) * amount
+    }
+    
+    var formattedTotalSpent: String {
+        let formatter = NumberFormatter()
+        formatter.numberStyle = .currency
+        formatter.currencyCode = currency
+        return formatter.string(from: totalSpent as NSNumber) ?? "\(totalSpent) \(currency)"
+    }
 }
 
 extension Array where Element == Subscription {
@@ -150,6 +211,56 @@ struct MonthlyCost: Identifiable {
         formatter.locale = Locale(identifier: "tr_TR")
         formatter.dateFormat = "LLL"
         return formatter.string(from: date).capitalized
+    }
+}
+
+/// Geçmiş ödeme kaydı
+struct PaymentRecord: Identifiable, Equatable {
+    let id = UUID()
+    let date: Date
+    let amount: Double
+    let currency: String
+    
+    var formattedDate: String {
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "tr_TR")
+        formatter.dateFormat = "d MMMM yyyy"
+        return formatter.string(from: date)
+    }
+    
+    var formattedAmount: String {
+        let formatter = NumberFormatter()
+        formatter.numberStyle = .currency
+        formatter.currencyCode = currency
+        return formatter.string(from: amount as NSNumber) ?? "\(amount) \(currency)"
+    }
+    
+    /// Ödemenin kaç gün önce yapıldığını hesaplar
+    var daysAgo: Int {
+        let calendar = Calendar.current
+        let now = calendar.startOfDay(for: Date())
+        let paymentDay = calendar.startOfDay(for: date)
+        return calendar.dateComponents([.day], from: paymentDay, to: now).day ?? 0
+    }
+    
+    var relativeTimeText: String {
+        let days = daysAgo
+        if days == 0 {
+            return "Bugün"
+        } else if days == 1 {
+            return "Dün"
+        } else if days < 7 {
+            return "\(days) gün önce"
+        } else if days < 30 {
+            let weeks = days / 7
+            return weeks == 1 ? "1 hafta önce" : "\(weeks) hafta önce"
+        } else if days < 365 {
+            let months = days / 30
+            return months == 1 ? "1 ay önce" : "\(months) ay önce"
+        } else {
+            let years = days / 365
+            return years == 1 ? "1 yıl önce" : "\(years) yıl önce"
+        }
     }
 }
 

@@ -28,13 +28,12 @@ SwiftUI tabanli, abonelik ve düzenli harcama takibi uygulamasi. Kullanici tum a
 - [x] Widget destegi: ana ekranda toplam aylik gider ve yakin yenilemeler.
 - [x] Spotlight entegrasyonu: abonelikleri sistem aramasindan bulma.
 - [x] Bildirim deep link: bildirime tiklandiginda ilgili abonelik detay sayfasi acilir.
-- [ ] Gecmis odemeler bolumu: detay sayfasinda odeme gecmisi listesi.
+- [x] Gecmis odemeler bolumu: detay sayfasinda odeme gecmisi listesi.
 
 ### Orta Vadeli Hedefler (v1.2)
-- [ ] Butce limiti: aylik harcama limiti belirleme ve asim uyarisi.
-- [ ] Doviz kuru donusturme: farkli para birimlerini tek para birimine cevirme.
-- [ ] iCloud senkronu: cihazlar arasi veri paylasimi.
-- [ ] Guvenlik: Face ID/Touch ID ile uygulama kilidi.
+- [x] Butce limiti: aylik harcama limiti belirleme ve asim uyarisi.
+- [x] Doviz kuru donusturme: farkli para birimlerini tek para birimine cevirme.
+- [x] iCloud senkronu: cihazlar arasi veri paylasimi (Pro ozelligi).
 
 ### Uzun Vadeli Hedefler (v2.0 - Pro)
 - [ ] Gelir modeli (abonelik sistemi):
@@ -57,7 +56,7 @@ SwiftUI tabanli, abonelik ve düzenli harcama takibi uygulamasi. Kullanici tum a
 ## Mimarinin Cizgileri
 - Sunum: SwiftUI + ViewModel (ObservableObject) kombinasyonu, yalın state.
 - Veri: Core Data stack, gelecek icin CloudKit hazirligi.
-- Servisler: NotificationScheduler, CurrencyFormatter, SampleDataLoader.
+- Servisler: NotificationScheduler, CurrencyConverter, SpotlightManager, WidgetDataManager, ProManager.
 - Tasarim: Apple Human Interface Guidelines; kart tabanli liste, adaptive grid.
 
 ## Calistirma

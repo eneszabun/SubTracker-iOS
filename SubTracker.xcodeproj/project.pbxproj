@@ -32,6 +32,8 @@
 		W1DG3T0003A2B3C4D5E6F7G8 /* SubTrackerWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = W1DG3T0004A2B3C4D5E6F7G8 /* SubTrackerWidget.swift */; };
 		W1DG3T0005A2B3C4D5E6F7G8 /* WidgetDataManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = W1DG3T0002A2B3C4D5E6F7G8 /* WidgetDataManager.swift */; };
 		W1DG3T0006A2B3C4D5E6F7G8 /* SubTrackerWidgetExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = W1DG3T0007A2B3C4D5E6F7G8 /* SubTrackerWidgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		CURR3NCY0001A2B3C4D5E6F7 /* CurrencyConverter.swift in Sources */ = {isa = PBXBuildFile; fileRef = CURR3NCY0002A2B3C4D5E6F7 /* CurrencyConverter.swift */; };
+		PR0MNGR0001A2B3C4D5E6F7G /* ProManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = PR0MNGR0002A2B3C4D5E6F7G /* ProManager.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -88,6 +90,8 @@
 		W1DG3T0007A2B3C4D5E6F7G8 /* SubTrackerWidgetExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = SubTrackerWidgetExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		W1DG3T0011A2B3C4D5E6F7G8 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		W1DG3T0012A2B3C4D5E6F7G8 /* SubTrackerWidget.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = SubTrackerWidget.entitlements; sourceTree = "<group>"; };
+		CURR3NCY0002A2B3C4D5E6F7 /* CurrencyConverter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurrencyConverter.swift; sourceTree = "<group>"; };
+		PR0MNGR0002A2B3C4D5E6F7G /* ProManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProManager.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -147,6 +151,8 @@
 				E21D7EEE34B68E6655DA08C1 /* SignInGateView.swift */,
 				6615FD0F3ED6D33E4E147268 /* SettingsView.swift */,
 				F4FC37CBA95C54BFBDCF1C06 /* YearlyBreakdownView.swift */,
+				CURR3NCY0002A2B3C4D5E6F7 /* CurrencyConverter.swift */,
+				PR0MNGR0002A2B3C4D5E6F7G /* ProManager.swift */,
 				BEF6A6A82CFECC0B0030A1C1 /* SubscriptionEntity+CoreDataClass.swift */,
 				BEF6A6A92CFECC0B0030A1C1 /* SubscriptionEntity+CoreDataProperties.swift */,
 				BEF6A6AA2CFECC0B0030A1C1 /* SubTracker.xcdatamodeld */,
@@ -300,6 +306,8 @@
 				65A15D1896A38EFF7292795A /* SignInGateView.swift in Sources */,
 				44B6C3AAB2B46FB3FAEF09CB /* SettingsView.swift in Sources */,
 				1E007FC92529F48C5983C589 /* YearlyBreakdownView.swift in Sources */,
+				CURR3NCY0001A2B3C4D5E6F7 /* CurrencyConverter.swift in Sources */,
+				PR0MNGR0001A2B3C4D5E6F7G /* ProManager.swift in Sources */,
 				BEF6A6AB2CFECC0B0030A1C1 /* SubscriptionEntity+CoreDataClass.swift in Sources */,
 				BEF6A6AC2CFECC0B0030A1C1 /* SubscriptionEntity+CoreDataProperties.swift in Sources */,
 				W1DG3T0001A2B3C4D5E6F7G8 /* WidgetDataManager.swift in Sources */,
