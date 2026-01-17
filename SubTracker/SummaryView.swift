@@ -3,6 +3,7 @@ import SwiftUI
 struct SummaryView: View {
     @Binding var subscriptions: [Subscription]
     @Binding var selectedTab: AppTab
+    @StateObject private var proManager = ProManager.shared
     @AppStorage("defaultCurrency") private var defaultCurrency = "USD"
     @AppStorage("reminderDays") private var reminderDays: Int = 3
     @AppStorage("monthlyBudgetEnabled") private var monthlyBudgetEnabled = false
@@ -10,6 +11,8 @@ struct SummaryView: View {
     @Environment(\.colorScheme) private var colorScheme
     @State private var selectedPeriod: SummaryPeriod = .yearly
     @State private var isPresentingAdd = false
+    @State private var showingCategoryReports = false
+    @State private var showingProUpgrade = false
     @State private var cachedMonthlyBreakdown: [MonthlyCost] = []
     
     /// Subscription ID'sine göre binding döndürür
@@ -123,6 +126,22 @@ struct SummaryView: View {
                 .foregroundStyle(SummaryLightPalette.textPrimary)
             Spacer()
             Button {
+                if proManager.canAccessProFeatures {
+                    showingCategoryReports = true
+                } else {
+                    showingProUpgrade = true
+                }
+            } label: {
+                Image(systemName: "chart.pie.fill")
+                    .font(.system(size: 18, weight: .semibold))
+                    .foregroundStyle(proManager.canAccessProFeatures ? SummaryLightPalette.primary : SummaryLightPalette.textMuted)
+                    .frame(width: 40, height: 40)
+                    .background(SummaryLightPalette.segmentBackground, in: Circle())
+            }
+            .buttonStyle(.plain)
+            .accessibilityLabel("Raporlar")
+            
+            Button {
                 selectedTab = .settings
             } label: {
                 Image(systemName: "gearshape")
@@ -143,6 +162,12 @@ struct SummaryView: View {
                 .fill(SummaryLightPalette.border.opacity(0.6))
                 .frame(height: 1)
         }
+        .sheet(isPresented: $showingCategoryReports) {
+            CategoryReportsView(subscriptions: subscriptions)
+        }
+        .sheet(isPresented: $showingProUpgrade) {
+            ProUpgradeSheet(proManager: proManager)
+        }
     }
 
     private var darkHeader: some View {
@@ -151,6 +176,22 @@ struct SummaryView: View {
                 .font(.system(size: 22, weight: .bold))
                 .foregroundStyle(SummaryDarkPalette.textPrimary)
             Spacer()
+            Button {
+                if proManager.canAccessProFeatures {
+                    showingCategoryReports = true
+                } else {
+                    showingProUpgrade = true
+                }
+            } label: {
+                Image(systemName: "chart.pie.fill")
+                    .font(.system(size: 18, weight: .semibold))
+                    .foregroundStyle(proManager.canAccessProFeatures ? SummaryDarkPalette.primary : SummaryDarkPalette.textPrimary)
+                    .frame(width: 40, height: 40)
+                    .background(SummaryDarkPalette.surfaceHighlight, in: Circle())
+            }
+            .buttonStyle(.plain)
+            .accessibilityLabel("Raporlar")
+            
             Button {
                 selectedTab = .settings
             } label: {

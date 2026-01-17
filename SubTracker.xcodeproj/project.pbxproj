@@ -34,6 +34,8 @@
 		W1DG3T0006A2B3C4D5E6F7G8 /* SubTrackerWidgetExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = W1DG3T0007A2B3C4D5E6F7G8 /* SubTrackerWidgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		CURR3NCY0001A2B3C4D5E6F7 /* CurrencyConverter.swift in Sources */ = {isa = PBXBuildFile; fileRef = CURR3NCY0002A2B3C4D5E6F7 /* CurrencyConverter.swift */; };
 		PR0MNGR0001A2B3C4D5E6F7G /* ProManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = PR0MNGR0002A2B3C4D5E6F7G /* ProManager.swift */; };
+		ST0REMGR0001A2B3C4D5E6F7 /* StoreManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = ST0REMGR0002A2B3C4D5E6F7 /* StoreManager.swift */; };
+		CATREP0RT0001A2B3C4D5E6F /* CategoryReportsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CATREP0RT0002A2B3C4D5E6F /* CategoryReportsView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -92,6 +94,8 @@
 		W1DG3T0012A2B3C4D5E6F7G8 /* SubTrackerWidget.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = SubTrackerWidget.entitlements; sourceTree = "<group>"; };
 		CURR3NCY0002A2B3C4D5E6F7 /* CurrencyConverter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurrencyConverter.swift; sourceTree = "<group>"; };
 		PR0MNGR0002A2B3C4D5E6F7G /* ProManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProManager.swift; sourceTree = "<group>"; };
+		ST0REMGR0002A2B3C4D5E6F7 /* StoreManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoreManager.swift; sourceTree = "<group>"; };
+		CATREP0RT0002A2B3C4D5E6F /* CategoryReportsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoryReportsView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -153,6 +157,8 @@
 				F4FC37CBA95C54BFBDCF1C06 /* YearlyBreakdownView.swift */,
 				CURR3NCY0002A2B3C4D5E6F7 /* CurrencyConverter.swift */,
 				PR0MNGR0002A2B3C4D5E6F7G /* ProManager.swift */,
+				ST0REMGR0002A2B3C4D5E6F7 /* StoreManager.swift */,
+				CATREP0RT0002A2B3C4D5E6F /* CategoryReportsView.swift */,
 				BEF6A6A82CFECC0B0030A1C1 /* SubscriptionEntity+CoreDataClass.swift */,
 				BEF6A6A92CFECC0B0030A1C1 /* SubscriptionEntity+CoreDataProperties.swift */,
 				BEF6A6AA2CFECC0B0030A1C1 /* SubTracker.xcdatamodeld */,
@@ -308,6 +314,8 @@
 				1E007FC92529F48C5983C589 /* YearlyBreakdownView.swift in Sources */,
 				CURR3NCY0001A2B3C4D5E6F7 /* CurrencyConverter.swift in Sources */,
 				PR0MNGR0001A2B3C4D5E6F7G /* ProManager.swift in Sources */,
+				ST0REMGR0001A2B3C4D5E6F7 /* StoreManager.swift in Sources */,
+				CATREP0RT0001A2B3C4D5E6F /* CategoryReportsView.swift in Sources */,
 				BEF6A6AB2CFECC0B0030A1C1 /* SubscriptionEntity+CoreDataClass.swift in Sources */,
 				BEF6A6AC2CFECC0B0030A1C1 /* SubscriptionEntity+CoreDataProperties.swift in Sources */,
 				W1DG3T0001A2B3C4D5E6F7G8 /* WidgetDataManager.swift in Sources */,

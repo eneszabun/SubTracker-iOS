@@ -36,17 +36,18 @@ SwiftUI tabanli, abonelik ve düzenli harcama takibi uygulamasi. Kullanici tum a
 - [x] iCloud senkronu: cihazlar arasi veri paylasimi (Pro ozelligi).
 
 ### Uzun Vadeli Hedefler (v2.0 - Pro)
-- [ ] Gelir modeli (abonelik sistemi):
-  - Ucretsiz katman: temel abonelik ekleme/listeleme, ozet ve bildirimler.
+- [x] Gelir modeli (abonelik sistemi):
+  - Ucretsiz katman: temel abonelik ekleme/listeleme, ozet ve bildirimler (maks 7 gun hatirlatma).
   - Pro aylik/yillik:
-    - iCloud senkronu.
-    - Ileri raporlama: kategori bazli dagilim grafikleri, birikimli nakit akisi analizi.
-    - Premium temalar ve ozel ikonlar.
+    - StoreKit 2 entegrasyonu ile gercek satin alma.
+    - iCloud senkronu (UI hazir, CloudKit entegrasyonu bekliyor).
+    - Ileri raporlama: kategori bazli dagilim grafikleri (pie chart).
     - Genis bildirim ufku (30 gune kadar).
   - Deneme: 7 gun ucretsiz Pro denemesi.
 - [ ] Apple Watch uygulamasi: bilekte hizli ozet ve yakin yenilemeler.
 - [ ] Siri kisayollari: sesli komutlarla abonelik ekleme/sorgulama.
 - [ ] Aile paylasimi: ortak abonelikleri aile uyeleriyle takip etme.
+- [ ] Premium temalar: ozel renk semalari ve uygulama ikonlari.
 
 ### Kalite ve Test
 - [ ] Birim testleri: model ve hesaplama fonksiyonlari icin.
@@ -56,7 +57,8 @@ SwiftUI tabanli, abonelik ve düzenli harcama takibi uygulamasi. Kullanici tum a
 ## Mimarinin Cizgileri
 - Sunum: SwiftUI + ViewModel (ObservableObject) kombinasyonu, yalın state.
 - Veri: Core Data stack, gelecek icin CloudKit hazirligi.
-- Servisler: NotificationScheduler, CurrencyConverter, SpotlightManager, WidgetDataManager, ProManager.
+- Servisler: NotificationScheduler, CurrencyConverter, SpotlightManager, WidgetDataManager, ProManager, StoreManager.
+- Monetizasyon: StoreKit 2 ile in-app purchase, transaction dogrulama ve abonelik yonetimi.
 - Tasarim: Apple Human Interface Guidelines; kart tabanli liste, adaptive grid.
 
 ## Calistirma

@@ -482,11 +482,18 @@ private struct CurrencySelectionView: View {
 
 private struct ReminderSelectionView: View {
     @Binding var selection: Int
+    @StateObject private var proManager = ProManager.shared
 
     var body: some View {
-        SettingsSelectionView(
+        let maxDays = proManager.canAccessProFeatures ? 30 : 7
+        let options = (1...maxDays).map { day -> SettingsOption<Int> in
+            let subtitle = !proManager.canAccessProFeatures && day > 7 ? "Pro Özelliği" : nil
+            return SettingsOption("\(day) Gün Önce", subtitle: subtitle, value: day)
+        }
+        
+        return SettingsSelectionView(
             title: "Hatırlatma Günü",
-            options: (1...30).map { SettingsOption("\($0) Gün Önce", value: $0) },
+            options: options,
             selection: $selection
         )
     }
@@ -929,8 +936,11 @@ private struct BudgetEditorSheet: View {
 
 private struct ProUpgradeSheet: View {
     @ObservedObject var proManager: ProManager
+    @StateObject private var storeManager = StoreManager.shared
     @Environment(\.dismiss) private var dismiss
     @Environment(\.colorScheme) private var colorScheme
+    @State private var showingError = false
+    @State private var errorMessage = ""
     
     private var palette: SettingsPalette {
         SettingsPalette(scheme: colorScheme)
@@ -979,32 +989,48 @@ private struct ProUpgradeSheet: View {
                     }
                     
                     // Pricing Section
-                    VStack(spacing: 16) {
-                        // Aylık Plan
-                        ProPlanCard(
-                            title: "Aylık",
-                            price: "₺49,99",
-                            period: "/ay",
-                            isPopular: false,
-                            palette: palette
-                        ) {
-                            // TODO: StoreKit satın alma
-                            proManager.activatePro()
-                            dismiss()
+                    if storeManager.isLoading {
+                        ProgressView()
+                            .padding(.vertical, 40)
+                    } else if storeManager.products.isEmpty {
+                        VStack(spacing: 12) {
+                            Image(systemName: "exclamationmark.triangle")
+                                .font(.system(size: 32, weight: .light))
+                                .foregroundStyle(palette.textMuted.opacity(0.5))
+                            Text("Ürünler yüklenemedi")
+                                .font(.system(size: 14, weight: .medium))
+                                .foregroundStyle(palette.textSecondary)
+                            Button("Tekrar Dene") {
+                                Task { await storeManager.loadProducts() }
+                            }
+                            .font(.system(size: 13, weight: .semibold))
+                            .foregroundStyle(palette.primary)
+                            .padding(.horizontal, 16)
+                            .padding(.vertical, 8)
+                            .background(palette.primary.opacity(0.1), in: Capsule())
                         }
-                        
-                        // Yıllık Plan
-                        ProPlanCard(
-                            title: "Yıllık",
-                            price: "₺399,99",
-                            period: "/yıl",
-                            savings: "2 ay ücretsiz",
-                            isPopular: true,
-                            palette: palette
-                        ) {
-                            // TODO: StoreKit satın alma
-                            proManager.activatePro()
-                            dismiss()
+                        .padding(.vertical, 40)
+                    } else {
+                        VStack(spacing: 16) {
+                            ForEach(storeManager.products, id: \.id) { product in
+                                let isYearly = product.id == StoreManager.ProductID.proYearly.rawValue
+                                let isPurchasing = case .purchasing = storeManager.purchaseState
+                                
+                                ProPlanCard(
+                                    title: isYearly ? "Yıllık" : "Aylık",
+                                    price: product.displayPrice,
+                                    period: isYearly ? "/yıl" : "/ay",
+                                    savings: isYearly ? savingsText(for: product) : nil,
+                                    isPopular: isYearly,
+                                    isPurchasing: isPurchasing,
+                                    palette: palette
+                                ) {
+                                    Task {
+                                        await storeManager.purchase(product)
+                                        handlePurchaseResult()
+                                    }
+                                }
+                            }
                         }
                     }
                     
@@ -1020,6 +1046,19 @@ private struct ProUpgradeSheet: View {
                         }
                         .padding(.top, 4)
                     }
+                    
+                    // Restore Button
+                    Button {
+                        Task {
+                            await storeManager.restorePurchases()
+                            handlePurchaseResult()
+                        }
+                    } label: {
+                        Text("Satın Almaları Geri Yükle")
+                            .font(.system(size: 13, weight: .semibold))
+                            .foregroundStyle(palette.textSecondary)
+                    }
+                    .padding(.top, 8)
                     
                     // Terms
                     Text("Satın alma işlemi Apple Kimliğinize faturalandırılır. Abonelik, mevcut dönem sona ermeden en az 24 saat önce iptal edilmediği sürece otomatik olarak yenilenir.")
@@ -1047,6 +1086,42 @@ private struct ProUpgradeSheet: View {
                     }
                 }
             }
+            .alert("Hata", isPresented: $showingError) {
+                Button("Tamam", role: .cancel) { }
+            } message: {
+                Text(errorMessage)
+            }
+            .task {
+                await storeManager.loadProducts()
+            }
+        }
+    }
+    
+    private func savingsText(for product: Product) -> String? {
+        guard let monthlyEquivalent = product.monthlyEquivalent else { return nil }
+        let formatter = NumberFormatter()
+        formatter.numberStyle = .currency
+        formatter.locale = product.priceFormatStyle.locale
+        if let monthlyStr = formatter.string(from: monthlyEquivalent as NSDecimalNumber) {
+            return "Ayda sadece \(monthlyStr)"
+        }
+        return "2 ay ücretsiz"
+    }
+    
+    private func handlePurchaseResult() {
+        switch storeManager.purchaseState {
+        case .purchased:
+            dismiss()
+        case .restored:
+            dismiss()
+        case .failed(let message):
+            errorMessage = message
+            showingError = true
+        case .cancelled:
+            // Kullanıcı iptal etti, bir şey yapma
+            break
+        default:
+            break
         }
     }
 }
@@ -1100,6 +1175,7 @@ private struct ProPlanCard: View {
     let period: String
     var savings: String? = nil
     let isPopular: Bool
+    var isPurchasing: Bool = false
     let palette: SettingsPalette
     let action: () -> Void
     
@@ -1138,14 +1214,19 @@ private struct ProPlanCard: View {
                     
                     Spacer()
                     
-                    HStack(alignment: .lastTextBaseline, spacing: 2) {
-                        Text(price)
-                            .font(.system(size: 24, weight: .black))
-                            .foregroundStyle(palette.textPrimary)
-                        
-                        Text(period)
-                            .font(.system(size: 12, weight: .medium))
-                            .foregroundStyle(palette.textSecondary)
+                    if isPurchasing {
+                        ProgressView()
+                            .tint(palette.textSecondary)
+                    } else {
+                        HStack(alignment: .lastTextBaseline, spacing: 2) {
+                            Text(price)
+                                .font(.system(size: 24, weight: .black))
+                                .foregroundStyle(palette.textPrimary)
+                            
+                            Text(period)
+                                .font(.system(size: 12, weight: .medium))
+                                .foregroundStyle(palette.textSecondary)
+                        }
                     }
                 }
             }
