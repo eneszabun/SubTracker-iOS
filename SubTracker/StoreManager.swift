@@ -180,7 +180,7 @@ class StoreManager: ObservableObject {
     // MARK: - Transaction Verification
     
     /// Transaction'ı doğrula
-    private func checkVerified<T>(_ result: VerificationResult<T>) throws -> T {
+    nonisolated private func checkVerified<T>(_ result: VerificationResult<T>) throws -> T {
         switch result {
         case .unverified:
             throw StoreError.failedVerification
@@ -193,7 +193,7 @@ class StoreManager: ObservableObject {
     
     /// Transaction güncellemelerini dinle
     private func listenForTransactions() -> Task<Void, Error> {
-        return Task.detached {
+        return Task {
             for await result in Transaction.updates {
                 do {
                     let transaction = try self.checkVerified(result)
