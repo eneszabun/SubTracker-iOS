@@ -64,3 +64,4 @@ SwiftUI tabanli, abonelik ve düzenli harcama takibi uygulamasi. Kullanici tum a
 ## Calistirma
 - Xcode 15+ ve iOS 17+ hedeflenir.
 - Projeyi `SubTracker.xcodeproj` ile acip build/run.
+- **Pro ozellikleri test icin**: `STOREKIT_SETUP.md` dosyasindaki adimlari takip edin.
