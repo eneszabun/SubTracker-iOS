@@ -68,56 +68,60 @@ struct CategoryReportsView: View {
             
             VStack(spacing: 20) {
                 // Chart with interactive popup
-                ZStack {
-                    if #available(iOS 17.0, *) {
-                        Chart(categoryData, id: \.category) { data in
-                            SectorMark(
-                                angle: .value("Tutar", data.total),
-                                innerRadius: .ratio(0.5),
-                                angularInset: 2
-                            )
-                            .foregroundStyle(data.category.color)
-                            .cornerRadius(4)
-                        }
-                        .chartAngleSelection(value: $selectedAngle)
-                        .onChange(of: selectedAngle) { oldValue, newValue in
-                            if let angle = newValue {
-                                selectedCategory = findCategory(for: angle)
-                            } else {
-                                selectedCategory = nil
+                GeometryReader { geometry in
+                    ZStack {
+                        if #available(iOS 17.0, *) {
+                            Chart(categoryData, id: \.category) { data in
+                                SectorMark(
+                                    angle: .value("Tutar", data.total),
+                                    innerRadius: .ratio(0.5),
+                                    angularInset: 2
+                                )
+                                .foregroundStyle(data.category.color)
+                                .cornerRadius(4)
                             }
-                        }
-                        .frame(height: 250)
-                    } else if #available(iOS 16.0, *) {
-                        Chart(categoryData, id: \.category) { data in
-                            SectorMark(
-                                angle: .value("Tutar", data.total),
-                                innerRadius: .ratio(0.5),
-                                angularInset: 2
-                            )
-                            .foregroundStyle(data.category.color)
-                            .cornerRadius(4)
-                        }
-                        .frame(height: 250)
-                        .overlay(chartTapOverlay)
-                    } else {
-                        // iOS 16 altı için basit görsel
-                        Circle()
-                            .fill(palette.primary.opacity(0.2))
-                            .frame(height: 250)
+                            .chartAngleSelection(value: $selectedAngle)
+                            .onChange(of: selectedAngle) { oldValue, newValue in
+                                withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
+                                    if let angle = newValue {
+                                        selectedCategory = findCategory(for: angle)
+                                    } else {
+                                        selectedCategory = nil
+                                    }
+                                }
+                            }
+                        } else if #available(iOS 16.0, *) {
+                            Chart(categoryData, id: \.category) { data in
+                                SectorMark(
+                                    angle: .value("Tutar", data.total),
+                                    innerRadius: .ratio(0.5),
+                                    angularInset: 2
+                                )
+                                .foregroundStyle(data.category.color)
+                                .cornerRadius(4)
+                            }
                             .overlay(
-                                Text("iOS 16+")
-                                    .foregroundStyle(palette.textSecondary)
+                                chartTapOverlay(in: geometry)
                             )
-                    }
-                    
-                    // Category popup
-                    if let category = selectedCategory,
-                       let data = categoryData.first(where: { $0.category == category }) {
-                        categoryPopup(for: data)
-                            .transition(.scale.combined(with: .opacity))
+                        } else {
+                            // iOS 16 altı için basit görsel
+                            Circle()
+                                .fill(palette.primary.opacity(0.2))
+                                .overlay(
+                                    Text("iOS 16+")
+                                        .foregroundStyle(palette.textSecondary)
+                                )
+                        }
+                        
+                        // Category popup
+                        if let category = selectedCategory,
+                           let data = categoryData.first(where: { $0.category == category }) {
+                            categoryPopup(for: data)
+                                .transition(.scale.combined(with: .opacity))
+                        }
                     }
                 }
+                .frame(height: 250)
                 
                 // Total
                 VStack(spacing: 4) {
@@ -275,15 +279,21 @@ struct CategoryReportsView: View {
     }
     
     @available(iOS 16.0, *)
-    private var chartTapOverlay: some View {
+    private func chartTapOverlay(in geometry: GeometryProxy) -> some View {
         Color.clear
             .contentShape(Rectangle())
             .gesture(
                 DragGesture(minimumDistance: 0)
                     .onEnded { value in
-                        let angle = calculateAngle(from: value.location)
+                        let center = CGPoint(
+                            x: geometry.size.width / 2,
+                            y: geometry.size.height / 2
+                        )
+                        let angle = calculateAngle(from: value.location, center: center)
+                        
                         withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
-                            if selectedAngle == angle {
+                            if let currentAngle = selectedAngle, abs(currentAngle - angle) < 5 {
+                                // Same category tapped, close popup
                                 selectedAngle = nil
                                 selectedCategory = nil
                             } else {
@@ -295,16 +305,18 @@ struct CategoryReportsView: View {
             )
     }
     
-    private func calculateAngle(from point: CGPoint) -> Double {
-        let center = CGPoint(x: 125, y: 125) // Chart center approximation
+    private func calculateAngle(from point: CGPoint, center: CGPoint) -> Double {
         let dx = point.x - center.x
         let dy = point.y - center.y
         let radians = atan2(dy, dx)
         var angle = radians * 180 / .pi
-        angle += 90 // Adjust to start from top
+        
+        // Convert to 0-360 degrees, starting from top (12 o'clock)
+        angle += 90
         if angle < 0 {
             angle += 360
         }
+        
         return angle
     }
 }
