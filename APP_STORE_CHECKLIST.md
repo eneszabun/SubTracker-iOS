@@ -59,8 +59,8 @@ Bu checklist'i yazdırabilir veya her adımı tamamladıkça işaretleyebilirsin
 - [X] Primary Category: **Finance**
 - [X] Secondary Category: **Productivity**
 - [X] Privacy Policy URL: `______________________________`
-- [ ] Terms URL: `______________________________`
-- [ ] Support URL: `______________________________`
+- [X] Terms URL: `______________________________`
+- [X] Support URL: `______________________________`
 
 ### Pricing & Availability
 - [X] Price: **Free**
@@ -71,9 +71,9 @@ Bu checklist'i yazdırabilir veya her adımı tamamladıkça işaretleyebilirsin
 ## 4️⃣ Screenshots (Minimum 3 adet gerekli)
 
 ### 6.7" iPhone için (Zorunlu)
-- [ ] Screenshot 1: Ana ekran (abonelik listesi)
-- [ ] Screenshot 2: Abonelik detay sayfası
-- [ ] Screenshot 3: Özet/istatistikler
+- [X] Screenshot 1: Ana ekran (abonelik listesi)
+- [X] Screenshot 2: Abonelik detay sayfası
+- [X] Screenshot 3: Özet/istatistikler
 
 ### Opsiyonel
 - [ ] Screenshot 4: Pro özellikleri ekranı
@@ -104,21 +104,21 @@ Bu checklist'i yazdırabilir veya her adımı tamamladıkça işaretleyebilirsin
 ## 6️⃣ Archive & Upload
 
 ### Archive Oluşturma
-- [ ] Xcode'da **Any iOS Device (arm64)** seç
-- [ ] Product → Clean Build Folder (⌘⇧K)
-- [ ] Product → Archive (⌘⇧B ile test)
-- [ ] Organizer açılır
-- [ ] **Validate App** çalıştır
-- [ ] Hatalar varsa düzelt
+- [X] Xcode'da **Any iOS Device (arm64)** seç
+- [X] Product → Clean Build Folder (⌘⇧K)
+- [X] Product → Archive (⌘⇧B ile test)
+- [X] Organizer açılır
+- [X] **Validate App** çalıştır
+- [X] Hatalar varsa düzelt
 
 ### Upload
-- [ ] **Distribute App** → App Store Connect
-- [ ] Upload seç
-- [ ] Export Compliance:
+- [X] **Distribute App** → App Store Connect
+- [X] Upload seç
+- [X] Export Compliance:
   - Uses Encryption: **YES**
   - Exempt: **YES**
-- [ ] Upload (5-15 dakika)
-- [ ] Email bekle: "Build processed"
+- [X] Upload (5-15 dakika)
+- [X] Email bekle: "Build processed"
 
 ---
 
@@ -127,24 +127,24 @@ Bu checklist'i yazdırabilir veya her adımı tamamladıkça işaretleyebilirsin
 **Not:** Build upload'dan SONRA yapabilirsiniz
 
 ### Subscription Group
-- [ ] App Store Connect → IAP → Create Subscription Group
-- [ ] Name: `SubTracker Pro`
+- [X] App Store Connect → IAP → Create Subscription Group
+- [X] Name: `SubTracker Pro`
 
 ### Aylık Abonelik
-- [ ] Create Subscription
-- [ ] Product ID: `com.subtracker.pro.monthly`
-- [ ] Duration: 1 Month
-- [ ] Price: $2.99 (USD)
-- [ ] Free Trial: 7 Days
+- [X] Create Subscription
+- [X] Product ID: `com.subtracker.pro.monthly`
+- [X] Duration: 1 Month
+- [X] Price: $2.99 (USD)
+- [] Free Trial: 7 Days
 - [ ] Turkish localization doldur
 - [ ] English localization doldur
 - [ ] Screenshot yükle
 
 ### Yıllık Abonelik  
-- [ ] Create Subscription
-- [ ] Product ID: `com.subtracker.pro.yearly`
-- [ ] Duration: 1 Year
-- [ ] Price: $29.00 (USD)
+- [X] Create Subscription
+- [X] Product ID: `com.subtracker.pro.yearly`
+- [X] Duration: 1 Year
+- [X] Price: $29.00 (USD)
 - [ ] Free Trial: 7 Days
 - [ ] Turkish localization doldur
 - [ ] English localization doldur

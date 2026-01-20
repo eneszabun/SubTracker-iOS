@@ -539,19 +539,143 @@ private struct CurrencySelectionView: View {
 private struct ReminderSelectionView: View {
     @Binding var selection: Int
     @StateObject private var proManager = ProManager.shared
+    @Environment(\.dismiss) private var dismiss
+    @Environment(\.colorScheme) private var colorScheme
+    
+    private var palette: SettingsPalette {
+        SettingsPalette(scheme: colorScheme)
+    }
 
     var body: some View {
         let maxDays = proManager.canAccessProFeatures ? 30 : 7
-        let options = (1...maxDays).map { day -> SettingsOption<Int> in
-            let subtitle = !proManager.canAccessProFeatures && day > 7 ? "Pro Özelliği" : nil
-            return SettingsOption("\(day) Gün Önce", subtitle: subtitle, value: day)
-        }
+        let columns = Array(repeating: GridItem(.flexible(), spacing: 12), count: 4)
         
-        return SettingsSelectionView(
-            title: "Hatırlatma Günü",
-            options: options,
-            selection: $selection
-        )
+        ScrollView {
+            VStack(spacing: 24) {
+                // Seçili gün göstergesi
+                VStack(spacing: 8) {
+                    Text("Yenilemeden önce bildirim")
+                        .font(.system(size: 13, weight: .medium))
+                        .foregroundStyle(palette.textSecondary)
+                    
+                    HStack(alignment: .lastTextBaseline, spacing: 4) {
+                        Text("\(selection)")
+                            .font(.system(size: 56, weight: .black))
+                            .foregroundStyle(palette.primary)
+                        
+                        Text("gün")
+                            .font(.system(size: 20, weight: .semibold))
+                            .foregroundStyle(palette.textSecondary)
+                    }
+                }
+                .padding(.top, 8)
+                
+                // Grid seçici
+                LazyVGrid(columns: columns, spacing: 12) {
+                    ForEach(1...maxDays, id: \.self) { day in
+                        Button {
+                            selection = day
+                            // Hafif bir gecikme ile otomatik kapanma
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                                dismiss()
+                            }
+                        } label: {
+                            DayCell(
+                                day: day,
+                                isSelected: selection == day,
+                                palette: palette
+                            )
+                        }
+                        .buttonStyle(.plain)
+                    }
+                    
+                    // Pro kullanıcı değilse kilitli günler
+                    if !proManager.canAccessProFeatures {
+                        ForEach(8...30, id: \.self) { day in
+                            Button {
+                                // Pro'ya yükselt mesajı gösterilebilir
+                            } label: {
+                                LockedDayCell(day: day, palette: palette)
+                            }
+                            .buttonStyle(.plain)
+                            .disabled(true)
+                        }
+                    }
+                }
+                .padding(.horizontal, 4)
+            }
+            .padding(.horizontal, 16)
+            .padding(.top, 12)
+            .padding(.bottom, 32)
+        }
+        .scrollIndicators(.hidden)
+        .background(palette.background)
+        .safeAreaInset(edge: .top, spacing: 0) {
+            SettingsDetailHeader(title: "Hatırlatma Günü", palette: palette)
+        }
+        .toolbar(.hidden, for: .navigationBar)
+    }
+}
+
+private struct DayCell: View {
+    let day: Int
+    let isSelected: Bool
+    let palette: SettingsPalette
+    
+    var body: some View {
+        ZStack {
+            if isSelected {
+                RoundedRectangle(cornerRadius: 16, style: .continuous)
+                    .fill(
+                        LinearGradient(
+                            colors: [palette.primary, palette.primary.opacity(0.8)],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        )
+                    )
+                    .shadow(color: palette.primary.opacity(0.4), radius: 8, x: 0, y: 4)
+            } else {
+                RoundedRectangle(cornerRadius: 16, style: .continuous)
+                    .fill(palette.surface)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 16, style: .continuous)
+                            .stroke(palette.cardBorder, lineWidth: 1)
+                    )
+            }
+            
+            Text("\(day)")
+                .font(.system(size: 18, weight: isSelected ? .bold : .semibold))
+                .foregroundStyle(isSelected ? Color.white : palette.textPrimary)
+        }
+        .frame(height: 64)
+        .contentShape(Rectangle())
+    }
+}
+
+private struct LockedDayCell: View {
+    let day: Int
+    let palette: SettingsPalette
+    
+    var body: some View {
+        ZStack {
+            RoundedRectangle(cornerRadius: 16, style: .continuous)
+                .fill(palette.surface.opacity(0.5))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 16, style: .continuous)
+                        .stroke(palette.cardBorder.opacity(0.5), lineWidth: 1)
+                )
+            
+            VStack(spacing: 4) {
+                Text("\(day)")
+                    .font(.system(size: 16, weight: .medium))
+                    .foregroundStyle(palette.textSecondary.opacity(0.4))
+                
+                Image(systemName: "lock.fill")
+                    .font(.system(size: 10, weight: .semibold))
+                    .foregroundStyle(palette.textSecondary.opacity(0.3))
+            }
+        }
+        .frame(height: 64)
     }
 }
 

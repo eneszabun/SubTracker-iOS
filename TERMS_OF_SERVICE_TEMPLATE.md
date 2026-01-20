@@ -101,7 +101,7 @@ You retain all rights to the subscription data you enter into the App. By using 
 
 ## 7. Privacy
 
-Your privacy is important to us. Please review our [Privacy Policy](PRIVACY_POLICY_URL) to understand how we collect, use, and protect your information.
+Your privacy is important to us. Please review our https://eneszabun.github.io/SubTracker-iOS/privacy-policy.html to understand how we collect, use, and protect your information.
 
 ## 8. Limitations of Liability
 
