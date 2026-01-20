@@ -31,7 +31,7 @@ To use SubTracker, you must sign in with Apple Sign In. You agree to:
 You may terminate your account at any time by:
 
 - Signing out and deleting the App
-- Contacting support at enes.sefa.zabun@gmail.com
+- Contacting support at enes.sefa.zabun@icloud.com
 
 We reserve the right to terminate accounts that violate these Terms.
 
@@ -163,7 +163,7 @@ These Terms shall be governed by and construed in accordance with the laws of Tu
 
 ### 13.1 Informal Resolution
 
-Before filing a claim, you agree to contact us at enes.sefa.zabun@gmail.com to attempt to resolve the dispute informally.
+Before filing a claim, you agree to contact us at enes.sefa.zabun@icloud.com to attempt to resolve the dispute informally.
 
 ### 13.2 Jurisdiction
 
@@ -181,7 +181,7 @@ These Terms, together with the Privacy Policy, constitute the entire agreement b
 
 For questions or concerns about these Terms, please contact us:
 
-**Email:** enes.sefa.zabun@gmail.com
+**Email:** enes.sefa.zabun@icloud.com
 
 ---
 

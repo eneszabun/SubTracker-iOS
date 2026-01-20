@@ -163,7 +163,7 @@ Eğer URL kesinlikle çalışmıyorsa ve düzeltemiyorsanız:
 1. App Store Connect → SubTracker → App Information
 2. **Support URL:** 
    ```
-   mailto:enes.sefa.zabun@gmail.com
+   mailto:enes.sefa.zabun@icloud.com
    ```
 
 **Not:** `mailto:` URL'leri de kabul edilir, ama web sayfası tercih edilir.

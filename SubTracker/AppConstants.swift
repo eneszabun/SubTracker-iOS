@@ -28,8 +28,8 @@ struct AppConstants {
     
     // MARK: - Contact
     
-    static let supportEmail = "support@yourdomain.com"
-    static let developerName = "Your Name"
+    static let supportEmail = "enes.sefa.zabun@icloud.com"
+    static let developerName = "Enes Sefa ZABUN"
     
     // MARK: - Product IDs (must match App Store Connect)
     

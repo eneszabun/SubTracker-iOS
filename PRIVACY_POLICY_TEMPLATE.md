@@ -142,7 +142,7 @@ Türkiye'de bulunan kullanıcılar için KVKK uyumu:
 
 If you have any questions about this Privacy Policy or your data, please contact us:
 
-**Email:** enes.sefa.zabun@gmail.com
+**Email:** enes.sefa.zabun@icloud.com
 
 ---
 
